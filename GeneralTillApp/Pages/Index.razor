@@ -1,0 +1,51 @@
+﻿@page "/"
+@using GeneralTillApp.Extensions
+@using GeneralTillApp.Data;
+
+@inject ApplicationDbContext _context
+
+<h1>Welcome To General Till</h1>
+<p>Login to access a full suite of easy to use web applications made for small business</p>
+
+@code   {
+
+    #region Properties
+
+    [CascadingParameter]
+    private Task<AuthenticationState> _authState { get; set; }
+
+    private AuthenticationState AuthState { get; set; }
+
+    public CustomUser User { get; set; }
+
+    #endregion
+
+    #region Constructor
+
+    public Index()
+    {
+        if (AuthState != null)
+        {
+            var test = new CustomUserExtensions(_context);
+            var user = test.GetCustomUser(AuthState);
+            Console.WriteLine(User.UserName);
+        }
+    }
+
+    #endregion
+
+    protected override async Task OnInitializedAsync()
+    {
+        AuthState = await _authState;
+    }
+
+    public void GetUser()
+    {
+        if (AuthState != null)
+        {
+            var test = new CustomUserExtensions(_context);
+            var user = test.GetCustomUser(AuthState);
+            Console.WriteLine(user.UserName);
+        }
+    }
+}

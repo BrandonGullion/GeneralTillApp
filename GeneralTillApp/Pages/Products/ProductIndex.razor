@@ -1,0 +1,154 @@
+﻿@using Syncfusion.Blazor.DropDowns
+@using Syncfusion.Blazor.Grids
+@using Microsoft.EntityFrameworkCore
+
+@page "/product"
+
+@inject NavigationManager _navManager
+@inject ApplicationDbContext _context
+
+<div class="row">
+    <h3 class="col-2">Products stuff</h3>
+    <div class="col-7"></div>
+    <button class="btn btn-primary col-1" @onclick="NavigateToAddProduct">Add product</button>
+</div>
+
+<br />
+
+<div class="row">
+    <SfGrid DataSource="Products"
+            TValue="Product"
+            Width="1400px"
+            AllowFiltering="true">
+        <GridEditSettings AllowDeleting="true"
+                          AllowEditing="true"
+                          AllowEditOnDblClick="true">
+        </GridEditSettings>
+
+        <GridColumns>
+            <GridColumn Field="@nameof(Product.Id)" IsPrimaryKey="true" Visible="false"></GridColumn>
+            <GridColumn Field="@nameof(Product.Title)"></GridColumn>
+            <GridColumn Field="@nameof(Product.Description)"></GridColumn>
+            <GridColumn Field="@nameof(Product.UPC)"></GridColumn>
+            <GridColumn Field="@nameof(Product.OnHand)" HeaderText="On Hand" Width="100" TextAlign="TextAlign.Center"></GridColumn>
+            <GridColumn Field="@nameof(Product.OnOrder)" HeaderText="On Order" Width="100" TextAlign="TextAlign.Center"></GridColumn>
+            <GridColumn Field="@nameof(Product.AcqCost)" HeaderText="Acq. Cost" Width="120" TextAlign="TextAlign.Center" Format="c"></GridColumn>
+            <GridColumn Field="@nameof(Product.Cost)" HeaderText="Retail Cost" Width="120" TextAlign="TextAlign.Center" Format="c"></GridColumn>
+            <GridColumn Field="ProductGroup.Name" HeaderText="Product Group">
+                <EditTemplate>
+                    <SfDropDownList @bind-Value="@((context as Product).ProductGroup)" TValue="ProductGroup" TItem="ProductGroup" DataSource="@ProductGroups" Placeholder="Select Group">
+                        <DropDownListFieldSettings Text="Name"></DropDownListFieldSettings>
+                    </SfDropDownList>
+                </EditTemplate>
+            </GridColumn>
+            <GridColumn Field="@nameof(Product.Discountable)" DisplayAsCheckBox="true" TextAlign="TextAlign.Center"></GridColumn>
+            <GridColumn Field="@nameof(Product.PST)" DisplayAsCheckBox="true" TextAlign="TextAlign.Center"></GridColumn>
+            <GridColumn Field="@nameof(Product.GST)" DisplayAsCheckBox="true" TextAlign="TextAlign.Center"></GridColumn>
+            <GridColumn Field="@nameof(Product.ShelfMin)" HeaderText="Shelf Min" Width="120" TextAlign="TextAlign.Center"></GridColumn>
+            <GridColumn Field="@nameof(Product.ShelfMax)" HeaderText="Shelf Max" Width="120" TextAlign="TextAlign.Center"></GridColumn>
+            <GridColumn Field="@nameof(Product.UnitSize)" HeaderText="Unit Size" Width="120" TextAlign="TextAlign.Center"></GridColumn>
+            <GridColumn Field="UnitOfMeasure.Name" HeaderText="Unit of Measure">
+                <EditTemplate>
+                    <SfDropDownList @bind-Value="((context as Product).UnitOfMeasure)" TValue="UnitOfMeasure" TItem="UnitOfMeasure" DataSource="@UnitOfMeasures" Placeholder="Select Unit Type">
+                        <DropDownListFieldSettings Text="Name"></DropDownListFieldSettings>
+                    </SfDropDownList>
+                </EditTemplate>
+            </GridColumn>
+            <GridColumn Field="@nameof(Product.DateAdded)" HeaderText="Date Added" Format="d" TextAlign="TextAlign.Center"></GridColumn>
+            <GridColumn Field="@nameof(Product.LastEdited)" HeaderText="Last Edited" Format="d"  TextAlign="TextAlign.Center"></GridColumn>
+
+            <GridColumn HeaderText="Manage" Width="120" AllowFiltering="false" IsFrozen="true" TextAlign="TextAlign.Center" HeaderTextAlign="TextAlign.Center">
+                <GridCommandColumns>
+                    <GridCommandColumn Type="CommandButtonType.Edit" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-edit", CssClass = "e-flat" })"></GridCommandColumn>
+                    <GridCommandColumn Type="CommandButtonType.Delete" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-delete", CssClass = "e-flat" })"></GridCommandColumn>
+                    <GridCommandColumn Type="CommandButtonType.Save" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-update", CssClass = "e-flat" })"></GridCommandColumn>
+                    <GridCommandColumn Type="CommandButtonType.Cancel" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-cancel-icon", CssClass = "e-flat" })"></GridCommandColumn>
+                </GridCommandColumns>
+            </GridColumn>
+        </GridColumns>
+        <GridEvents TValue="Product" OnActionBegin="ActionBeginProduct"></GridEvents>
+    </SfGrid>
+</div>
+
+@code {
+
+    #region Properties
+    private List<Product> Products { get; set; }
+    private List<ProductGroup> ProductGroups { get; set; }
+    private List<UnitOfMeasure> UnitOfMeasures { get; set; }
+
+    #endregion
+
+    #region Methods
+
+    private void NavigateToAddProduct()
+    {
+        _navManager.NavigateTo("/product/addproduct");
+    }
+
+    protected override void OnInitialized()
+    {
+        Products = _context.Products.Include(p => p.ProductGroup).ToList();
+        UnitOfMeasures = _context.UnitOfMeasures.ToList();
+        ProductGroups = _context.ProductGroups.ToList();
+    }
+
+    // Grid Save and Delete Db Context extensions
+    private void ActionBeginProduct(ActionEventArgs<Product> arg)
+    {
+        // General save action
+        if (arg.RequestType.Equals(Syncfusion.Blazor.Grids.Action.Save))
+        {
+            if (arg.Data.Id != 0)
+            {
+                var product = _context.Products.FirstOrDefault(p => p.Id == arg.Data.Id);
+                if (product != null)
+                {
+                    product.Title = arg.Data.Title;
+                    product.Description = arg.Data.Description;
+                    product.UPC = arg.Data.UPC;
+                    product.OnHand = arg.Data.OnHand;
+                    product.OnOrder = arg.Data.OnOrder;
+                    product.AcqCost = arg.Data.AcqCost;
+                    product.Cost = arg.Data.Cost;
+                    product.Discountable = arg.Data.Discountable;
+                    product.PST = arg.Data.PST;
+                    product.GST = arg.Data.GST;
+                    product.ShelfMax = arg.Data.ShelfMax;
+                    product.ShelfMin = arg.Data.ShelfMin;
+                    product.UnitSize = arg.Data.UnitSize;
+                    product.LastEdited = DateTime.Now;
+
+                    // Only update the values if the product group is changed
+                    if (arg.Data.ProductGroup != null)
+                    {
+                        product.ProductGroup = arg.Data.ProductGroup;
+                        product.ProductGroupId = arg.Data.ProductGroup.Id;
+                    }
+
+                    if (arg.Data.UnitOfMeasure != null)
+                    {
+                        product.UnitOfMeasure = arg.Data.UnitOfMeasure;
+                        product.UnitOfMeasureId = arg.Data.UnitOfMeasure.Id;
+                    }
+
+                    // Update the product and Save the changes
+                    _context.Products.Update(product);
+                    _context.SaveChanges();
+                }
+                else
+                    Console.WriteLine("There was an error saving the product");
+            }
+            else
+                Console.WriteLine("The id was set to 0");
+        }
+
+        // Delete Action
+        if (arg.RequestType.Equals(Syncfusion.Blazor.Grids.Action.Delete))
+        {
+            _context.Products.Remove(arg.Data);
+            _context.SaveChanges();
+        }
+    }
+    #endregion
+}

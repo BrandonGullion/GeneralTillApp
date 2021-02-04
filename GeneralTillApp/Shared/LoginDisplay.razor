@@ -1,0 +1,24 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using Microsoft.AspNetCore.Http
+
+@inject UserManager<CustomUser> userManager
+@inject SignInManager<CustomUser> signInManager
+@inject IHttpContextAccessor httpAccessor
+
+<AuthorizeView>
+    <Authorized>
+        <a>Welcome, @context.User.Identity.Name!</a>
+        <a href="Identity/Account/Register">Register New User</a>
+        <form method="post" action="Identity/Account/LogOut">
+            <button type="submit" class="nav-link btn btn-link">Log out</button>
+        </form>
+    </Authorized>
+    <NotAuthorized>
+        <a href="Identity/Account/Login">Log in</a>
+    </NotAuthorized>
+</AuthorizeView>
+
+@code  {
+
+
+}

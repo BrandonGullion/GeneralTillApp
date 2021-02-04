@@ -1,0 +1,183 @@
+﻿@page "/product/settings"
+
+@inject ApplicationDbContext _context
+
+<h3>Product Settings</h3>
+
+<!-- Top card -->
+<div class="card" style="background-color:azure; padding:1em">
+    <div class="row">
+        <!-- Product Group Grid -->
+        <div class="col-12">
+            <label class="card-title">Product Groups</label>
+            <SfGrid DataSource="@ProductGroups"
+                    AllowSorting="true"
+                    AllowFiltering="true"
+                    EnableHover="true"
+                    ID="ProductGroup"
+                    Toolbar="ToolbarItems">
+                <!-- Allows for sorting by name to begin -->
+                <GridSortSettings>
+                    <GridSortColumns>
+                        <GridSortColumn Field="@nameof(ProductGroup.Name)" Direction="SortDirection.Ascending"></GridSortColumn>
+                    </GridSortColumns>
+                </GridSortSettings>
+                <GridEditSettings AllowAdding="true"
+                                  AllowEditing="true"
+                                  AllowDeleting="true"
+                                  AllowEditOnDblClick="true" ShowDeleteConfirmDialog="true">
+                </GridEditSettings>
+                <GridColumns>
+                    <GridColumn Field="@nameof(ProductGroup.Id)" IsPrimaryKey="true" Visible="false"></GridColumn>
+                    <GridColumn Field="@nameof(ProductGroup.Name)" HeaderText="Product Name" Width="300"></GridColumn>
+                    <GridColumn Field="@nameof(ProductGroup.ProductsInGroup)" HeaderText="# Prod. in Group" Width="110" TextAlign="TextAlign.Center"></GridColumn>
+                    <GridColumn Field="@nameof(ProductGroup.Promotion)" HeaderText="Promotion" Width="100" TextAlign="TextAlign.Center"></GridColumn>
+                    <GridColumn Field="@nameof(ProductGroup.PromotionPercent)" HeaderText="% Discount" Width="100" TextAlign="TextAlign.Center"></GridColumn>
+                    <GridColumn Field="@nameof(ProductGroup.PromotionAmount)" Format="C2" HeaderText="$ Discount" Width="100" TextAlign="TextAlign.Center"></GridColumn>
+                    <GridColumn Field="@nameof(ProductGroup.PromoStartDate)" Format="d" HeaderText="Promo Start" Width="100" TextAlign="TextAlign.Center"></GridColumn>
+                    <GridColumn Field="@nameof(ProductGroup.PromoEndDate)" Format="d" HeaderText="Promo End" Width="100" TextAlign="TextAlign.Center"></GridColumn>
+
+                    <GridColumn HeaderText="Manage" Width="80" AllowFiltering="false" TextAlign="TextAlign.Center">
+                        <GridCommandColumns>
+                            <GridCommandColumn Type="CommandButtonType.Edit" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-edit", CssClass = "e-flat" })"></GridCommandColumn>
+                            <GridCommandColumn Type="CommandButtonType.Delete" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-delete", CssClass = "e-flat" })"></GridCommandColumn>
+                            <GridCommandColumn Type="CommandButtonType.Save" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-update", CssClass = "e-flat" })"></GridCommandColumn>
+                            <GridCommandColumn Type="CommandButtonType.Cancel" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-cancel-icon", CssClass = "e-flat" })"></GridCommandColumn>
+                        </GridCommandColumns>
+                    </GridColumn>
+                </GridColumns>
+                <GridEvents TValue="ProductGroup" OnActionBegin="ActionBeginProductGroup"></GridEvents>
+            </SfGrid>
+        </div>
+        <!-- Unit of measure grid -->
+    </div>
+</div>
+<br />
+<!-- Secondary Card -->
+<div class="card" style="padding:1em; background-color:azure">
+    <label class="card-title">Units of Measure</label>
+    <SfGrid DataSource="@UnitOfMeasures"
+            AllowSorting="true"
+            AllowFiltering="true"
+            EnableHover="true"
+            Toolbar="ToolbarItems">
+        <GridSortSettings>
+            <GridSortColumns>
+                <GridSortColumn Field="@nameof(UnitOfMeasure.Name)" Direction="SortDirection.Ascending"></GridSortColumn>
+            </GridSortColumns>
+        </GridSortSettings>
+        <GridEditSettings AllowAdding="true"
+                          AllowEditing="true"
+                          AllowDeleting="true"
+                          AllowEditOnDblClick="true"
+                          ShowDeleteConfirmDialog="true">
+        </GridEditSettings>
+        <GridColumns>
+            <GridColumn Field="@nameof(UnitOfMeasure.Id)" IsPrimaryKey="true" Visible="false"></GridColumn>
+            <GridColumn Field="@nameof(UnitOfMeasure.Name)" HeaderText="Unit of Measure"></GridColumn>
+            <GridColumn HeaderText="Manage" Width="120" AllowFiltering="false">
+                <GridCommandColumns>
+                    <GridCommandColumn Type="CommandButtonType.Edit" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-edit", CssClass = "e-flat" })"></GridCommandColumn>
+                    <GridCommandColumn Type="CommandButtonType.Delete" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-delete", CssClass = "e-flat" })"></GridCommandColumn>
+                    <GridCommandColumn Type="CommandButtonType.Save" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-update", CssClass = "e-flat" })"></GridCommandColumn>
+                    <GridCommandColumn Type="CommandButtonType.Cancel" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-cancel-icon", CssClass = "e-flat" })"></GridCommandColumn>
+                </GridCommandColumns>
+            </GridColumn>
+        </GridColumns>
+        <GridEvents TValue="UnitOfMeasure" OnActionBegin="ActionBeginUnitOfMeasure"></GridEvents>
+    </SfGrid>
+</div>
+
+<br />
+<br />
+<br />
+<br />
+<br />
+
+
+@code {
+
+    private ProductGroup ProductGroup { get; set; }
+    private UnitOfMeasure UnitOfMeasure { get; set; }
+
+    private List<ProductGroup> ProductGroups { get; set; }
+    private List<UnitOfMeasure> UnitOfMeasures { get; set; }
+
+    public string[] ToolbarItems { get; set; } = new string[] { "Add" };
+
+
+    protected override void OnInitialized()
+    {
+        ProductGroups = _context.ProductGroups.ToList();
+        UnitOfMeasures = _context.UnitOfMeasures.ToList();
+    }
+
+    // This can be used when updating items for the data base
+    public void ActionBeginProductGroup(ActionEventArgs<ProductGroup> arg)
+    {
+        // Save action
+        if (arg.RequestType.Equals(Syncfusion.Blazor.Grids.Action.Save))
+        {
+            if (arg.Data.Id == 0)
+                _context.ProductGroups.Add(arg.Data);
+            if (arg.Data.Id != 0)
+            {
+                var productGroup = _context.ProductGroups.FirstOrDefault(p => p.Id == arg.Data.Id);
+                productGroup.Name = arg.Data.Name;
+                productGroup.ProductsInGroup = arg.Data.ProductsInGroup;
+                productGroup.Promotion = arg.Data.Promotion;
+                productGroup.PromotionAmount = arg.Data.PromotionAmount;
+                productGroup.PromotionPercent = arg.Data.PromotionPercent;
+                productGroup.PromoStartDate = arg.Data.PromoStartDate;
+                productGroup.PromoEndDate = arg.Data.PromoEndDate;
+                _context.ProductGroups.Update(productGroup);
+            }
+
+            _context.SaveChanges();
+        }
+
+        // Delete Action
+        if (arg.RequestType.Equals(Syncfusion.Blazor.Grids.Action.Delete))
+        {
+            if (arg.Data != null)
+            {
+                _context.ProductGroups.Remove(arg.Data);
+                _context.SaveChanges();
+            }
+
+            if (arg.Data == null)
+                Console.WriteLine("Could not delete object in database");
+        }
+    }
+
+    public void ActionBeginUnitOfMeasure(ActionEventArgs<UnitOfMeasure> arg)
+    {
+        // Save action
+        if (arg.RequestType.Equals(Syncfusion.Blazor.Grids.Action.Save))
+        {
+            if (arg.Data.Id == 0)
+                _context.UnitOfMeasures.Add(arg.Data);
+            if (arg.Data.Id != 0)
+            {
+                var unitOfMeasure = _context.UnitOfMeasures.FirstOrDefault(u => u.Id == arg.Data.Id);
+                unitOfMeasure.Name = arg.Data.Name;
+                _context.UnitOfMeasures.Update(unitOfMeasure);
+            }
+            _context.SaveChanges();
+        }
+
+
+        // Delete Action
+        if (arg.RequestType.Equals(Syncfusion.Blazor.Grids.Action.Delete))
+        {
+            if (arg.Data != null)
+            {
+                _context.UnitOfMeasures.Remove(arg.Data);
+                _context.SaveChanges();
+            }
+
+            if (arg.Data == null)
+                Console.WriteLine("Could not delete object in database");
+        }
+    }
+}
