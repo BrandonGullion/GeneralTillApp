@@ -12,11 +12,13 @@ namespace GeneralTillApp.Managers
     {
         public ProductManager ProductManager { get; set; }
         public CustomerManager CustomerManager { get; set; }
+        public NotificationManager NotificationManager { get; set; }
 
         public StateManager()
         {
             ProductManager = new ProductManager();
             CustomerManager = new CustomerManager();
+            NotificationManager = new NotificationManager();
         }
     }
 }

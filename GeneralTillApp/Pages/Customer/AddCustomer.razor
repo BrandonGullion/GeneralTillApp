@@ -1,5 +1,132 @@
-﻿<h3>AddCustomer</h3>
+﻿@page "/customer/add"
+@inject ApplicationDbContext _context
+@inject NavigationManager _navManager
+@inject StateManager _stateManager
+
+<h3>Add Customer</h3>
+
+<EditForm Model="Customer" OnValidSubmit="Save">
+    <DataAnnotationsValidator></DataAnnotationsValidator>
+    <ValidationSummary></ValidationSummary>
+    <div class="row">
+        <!-- Left side of the row -->
+        <div class="col-5">
+            <div>
+                <label>First Name</label>
+                <InputText class="form-control" @bind-Value="Customer.FirstName"></InputText>
+                <ValidationMessage For="() => Customer.FirstName"></ValidationMessage>
+            </div>
+
+            <div>
+                <label>Street Address</label>
+                <InputText class="form-control" @bind-Value="Customer.StreetAddress"></InputText>
+            </div>
+
+            <div class="row">
+                <div class="col-5">
+                    <label>City</label>
+                    <InputText class="form-control" @bind-Value="Customer.City"></InputText>
+                </div>
+                <div class="col-4">
+                    <label>Province/State</label>
+                    <InputText class="form-control" @bind-Value="Customer.Province_State"></InputText>
+                </div>
+                <div class="col-3">
+                    <label>Postal/Zip Code</label>
+                    <InputText class="form-control" @bind-Value="@Customer.PostalCode"></InputText>
+                </div>
+            </div>
+
+            <div>
+                <label>Country</label>
+                <InputText class="form-control" @bind-Value="@Customer.Country"></InputText>
+            </div>
+            <div>
+                <label>Customer Group</label>
+                <select class="form-control" @bind="Customer.CustomerGroupId" >
+                    @foreach(var customerGroup in CustomerGroups)
+                    {
+                        <option value="@customerGroup.Id">@customerGroup.Name</option>
+                    }
+                </select>
+            </div>
+        </div>
+        
+        <!-- Right Side of the Row -->
+        <div class="col-5">
+            <div>
+                <label>Last Name</label>
+                <InputText class="form-control" @bind-Value="Customer.LastName"></InputText>
+                <ValidationMessage For="() => Customer.LastName"></ValidationMessage>
+            </div>
+            <div class="row">
+                <div class="col-6">
+                    <label>Phone Number</label>
+                    <InputText class="form-control" @bind-Value="Customer.TelephoneNumber"></InputText>
+                </div>
+                <div class="col-6">
+                    <label>Email</label>
+                    <InputText class="form-control" @bind-Value="Customer.Email"></InputText>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-4">
+                    <label>A/R Limit</label>
+                    <InputNumber class="form-control" @bind-Value="Customer.ARBalance"></InputNumber>
+                </div>
+                <div class="col-4">
+                    <label>Discount Percent</label>
+                    <InputNumber class="form-control" @bind-Value="Customer.DiscountPercent"></InputNumber>
+                </div>
+            </div>
+            <div>
+                <label>Notes :</label>
+                <SfRichTextEditor ShowCharCount="true" @bind-Value="@Customer.Note">
+                </SfRichTextEditor>
+            </div>
+        </div>
+    </div>
+
+    <button class="btn btn-primary" type="submit">Add Customer</button>
+</EditForm>
 
 @code {
+
+    public Customer Customer { get; set; }
+    public List<CustomerGroup> CustomerGroups { get; set; }
+
+    protected override void OnInitialized()
+    {
+        Customer = new Customer();
+
+        CustomerGroups = _context.CustomerGroups.ToList();
+    }
+
+    public void Save()
+    {
+        if(Customer != null)
+        {
+            // Set the customer group depending on selected group 
+           if(Customer.CustomerGroupId != 0)
+                Customer.CustomerGroup = _context.CustomerGroups.FirstOrDefault(c => c.Id == Customer.CustomerGroupId);
+
+            // Set the customer group to none if nothing selected 
+            if(Customer.CustomerGroupId == 0)
+            {
+                Customer.CustomerGroup = _context.CustomerGroups.FirstOrDefault(c => c.Name == "None");
+                Customer.CustomerGroupId = Customer.CustomerGroup.Id;
+            }
+
+            Customer.DateCreated = DateTime.Now;
+            Customer.LastEdited = DateTime.Now;
+
+            _context.Customers.Add(Customer);
+            _context.SaveChanges();
+
+            _stateManager.NotificationManager.AddNotification<Customer>(Customer, NotificationManager.NotificationStatus.Success);
+
+            _navManager.NavigateTo("/customer");
+        }
+    }
 
 }

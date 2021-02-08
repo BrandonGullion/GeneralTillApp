@@ -147,18 +147,30 @@
             if (Product.ProductGroupId == 0)
                 Product.ProductGroupId = productGroups.FirstOrDefault(p => p.Name == "None").Id;
 
-            if (Product.UnitOfMeasureId != 0)
-                Product.UnitOfMeasure = _context.UnitOfMeasures.FirstOrDefault(u => u.Id == Product.UnitOfMeasureId);
+            // Set the unit of measure if none selected 
+            if (Product.UnitOfMeasureId == 0)
+                Product.UnitOfMeasureId = _context.UnitOfMeasures.FirstOrDefault(u => u.Name == "None").Id;
 
+            // Sets the ProductGroup and UnitOfMeasure class depending on the Id
             Product.ProductGroup = productGroups.FirstOrDefault(p => p.Id == Product.ProductGroupId);
+            Product.UnitOfMeasure = unitOfMeasures.FirstOrDefault(u => u.Id == Product.UnitOfMeasureId);
+
+            // Set the creation date 
+            Product.DateAdded = DateTime.Now;
+            Product.LastEdited = DateTime.Now;
 
             _context.Products.Add(Product);
             _context.SaveChanges();
 
             Console.WriteLine($"Successfully added {Product.Title} to the DB");
+            _manager.NotificationManager.AddNotification<Product>(Product, NotificationManager.NotificationStatus.Success);
+
             _navManager.NavigateTo("/product");
         }
-        Console.WriteLine("There was an error saving the product to the DB");
+        else
+        {
+            Console.WriteLine("There was an error saving the product to the DB");
+        }
     }
 
 }

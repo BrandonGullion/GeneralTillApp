@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Components.Authorization;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -10,6 +11,7 @@ namespace GeneralTillApp.Extensions
     public class CustomUserExtensions 
     {
         private ApplicationDbContext _context { get; set; }
+
 
         public CustomUserExtensions(ApplicationDbContext context)
         {

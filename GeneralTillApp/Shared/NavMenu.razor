@@ -26,6 +26,7 @@
         {
             @if (User.UserRole == StaticMembers.Role_Admin || User.UserRole == StaticMembers.Role_Management)
             {
+                <!-- Product Nav Menu Dropdown-->
                 <li class="nav-item px-3">
                     <NavLink @onclick="() => expandMenu = !expandMenu"
                              class="nav-link px-3"
@@ -61,6 +62,43 @@
 
                     }
                 </li>
+
+                <!-- Customer Nav Menu Dropdown -->
+                <li class="nav-item px-3">
+                    <NavLink @onclick="() => customerExpandMenu = !customerExpandMenu"
+                             class="nav-link px-3"
+                             style="cursor:pointer">
+                        @if (!customerExpandMenu)
+                        {<i class="far fa-caret-square-right" style="font-size:20px; margin-right:1em"></i>}
+                        @if (customerExpandMenu)
+                        {<i class="far fa-caret-square-down" style="font-size:20px; margin-right:1em"></i>}
+                        Customers
+                    </NavLink>
+                    @if (customerExpandMenu)
+                    {
+                        <ul>
+                            <li class="nav-item">
+                                <NavLink class="nav-link" style="cursor:pointer" href="/customer">
+                                    <i class="far fa-square" style="font-size:15px"></i>
+                                    &nbsp;&nbsp;All Customers
+                                </NavLink>
+                            </li>
+                            <li class="nav-item">
+                                <NavLink class="nav-link" style="cursor:pointer" href="/customer/add">
+                                    <i class="far fa-square" style="font-size:15px"></i>
+                                    &nbsp;&nbsp;Add Customer
+                                </NavLink>
+                            </li>
+                            <li class="nav-item">
+                                <NavLink class="nav-link" style="cursor:pointer" href="/customer/settings">
+                                    <i class="far fa-square" style="font-size:15px"></i>
+                                    &nbsp;&nbsp;Customer Settings
+                                </NavLink>
+                            </li>
+                        </ul>
+
+                    }
+                </li>
             }
         }
     </ul>
@@ -83,6 +121,8 @@
     private bool collapseNavMenu = true;
 
     private bool expandMenu { get; set; }
+
+    private bool customerExpandMenu { get; set; }
 
     private string NavMenuCssClass => collapseNavMenu ? "collapse" : null;
 

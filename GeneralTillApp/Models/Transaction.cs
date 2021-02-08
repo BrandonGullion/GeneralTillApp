@@ -12,8 +12,9 @@ namespace GeneralTillApp.Models
         public double SubTotal { get; set; }
         public double Total { get; set; }
         public Tax Tax { get; set; }
-        public IEnumerable<Product> Products { get; set; }
+        public IEnumerable<CartItem> CartItems { get; set; }
         public DateTime PurchaseTime { get; set; }
+
         public int CustomerId { get; set; }
 
         [ForeignKey(nameof(CustomerId))]

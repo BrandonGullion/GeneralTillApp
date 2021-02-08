@@ -16,5 +16,10 @@ namespace GeneralTillApp
         public static string Role_Default { get; set; } = "Default";
         #endregion
 
+        #region Keyboard Pressed
+
+        public static string EnterKey { get; set; } = "Enter";
+        #endregion
+
     }
 }

@@ -46,7 +46,7 @@ namespace GeneralTillApp
             services.AddRazorPages();
             services.AddServerSideBlazor();
             services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<IdentityUser>>();
-            services.AddSingleton<StateManager>();
+            services.AddScoped<StateManager>();
             services.AddScoped<ApplicationDbContext>();
         }
 

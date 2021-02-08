@@ -4,14 +4,16 @@ using GeneralTillApp.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace GeneralTillApp.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210205054611_AddedPostalCodeToCustomerClass")]
+    partial class AddedPostalCodeToCustomerClass
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -94,31 +96,6 @@ namespace GeneralTillApp.Data.Migrations
                     b.ToTable("AspNetUsers");
                 });
 
-            modelBuilder.Entity("GeneralTillApp.Models.CartItem", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<int>("Count")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("ProductId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("TransactionId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ProductId");
-
-                    b.HasIndex("TransactionId");
-
-                    b.ToTable("CartItem");
-                });
-
             modelBuilder.Entity("GeneralTillApp.Models.Customer", b =>
                 {
                     b.Property<int>("Id")
@@ -127,9 +104,6 @@ namespace GeneralTillApp.Data.Migrations
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<double>("ARBalance")
-                        .HasColumnType("float");
-
-                    b.Property<double>("ARLimit")
                         .HasColumnType("float");
 
                     b.Property<string>("City")
@@ -153,9 +127,6 @@ namespace GeneralTillApp.Data.Migrations
                     b.Property<string>("FirstName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("LastEdited")
-                        .HasColumnType("datetime2");
 
                     b.Property<string>("LastName")
                         .IsRequired()
@@ -252,6 +223,9 @@ namespace GeneralTillApp.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int?>("TransactionId")
+                        .HasColumnType("int");
+
                     b.Property<string>("UPC")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -265,6 +239,8 @@ namespace GeneralTillApp.Data.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("ProductGroupId");
+
+                    b.HasIndex("TransactionId");
 
                     b.HasIndex("UnitOfMeasureId");
 
@@ -514,17 +490,6 @@ namespace GeneralTillApp.Data.Migrations
                     b.ToTable("AspNetUserTokens");
                 });
 
-            modelBuilder.Entity("GeneralTillApp.Models.CartItem", b =>
-                {
-                    b.HasOne("GeneralTillApp.Models.Product", "Product")
-                        .WithMany()
-                        .HasForeignKey("ProductId");
-
-                    b.HasOne("GeneralTillApp.Models.Transaction", null)
-                        .WithMany("CartItems")
-                        .HasForeignKey("TransactionId");
-                });
-
             modelBuilder.Entity("GeneralTillApp.Models.Customer", b =>
                 {
                     b.HasOne("GeneralTillApp.Models.CustomerGroup", "CustomerGroup")
@@ -541,6 +506,10 @@ namespace GeneralTillApp.Data.Migrations
                         .HasForeignKey("ProductGroupId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("GeneralTillApp.Models.Transaction", null)
+                        .WithMany("Products")
+                        .HasForeignKey("TransactionId");
 
                     b.HasOne("GeneralTillApp.Models.UnitOfMeasure", "UnitOfMeasure")
                         .WithMany()

@@ -10,6 +10,8 @@ namespace GeneralTillApp.Managers
     public class ProductManager
     {
         public Product Product { get; set; }
+        public Product NotificationProduct { get; private set; }
+        public bool AwaitingNotification { get; private set; }
 
         public ProductManager()
         {
@@ -43,5 +45,8 @@ namespace GeneralTillApp.Managers
 
             return product;
         }
+
+
+
     }
 }

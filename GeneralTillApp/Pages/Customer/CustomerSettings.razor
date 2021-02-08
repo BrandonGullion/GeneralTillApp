@@ -1,0 +1,97 @@
+﻿@page "/customer/settings"
+@inject ApplicationDbContext _context
+
+<h3>Customer Settings</h3>
+
+<div class="card">
+    <div class="row">
+        <div class="col-4">
+            <label class="card-header">Customer Groups</label>
+            <SfGrid DataSource="@CustomerGroups"
+                    AllowSorting="true"
+                    AllowFiltering="true"
+                    EnableHover="true"
+                    Toolbar="ToolbarItems">
+                <GridSortSettings>
+                    <GridSortColumns>
+                        <GridSortColumn Field="@nameof(CustomerGroup.Name)" Direction="SortDirection.Ascending"></GridSortColumn>
+                    </GridSortColumns>
+                </GridSortSettings>
+                <GridEditSettings AllowAdding="true"
+                                  AllowDeleting="true"
+                                  AllowEditing="true"
+                                  AllowEditOnDblClick="true"
+                                  ShowConfirmDialog="true">
+                </GridEditSettings>
+                <GridColumns>
+                    <GridColumn Field="@nameof(CustomerGroup.Name)" HeaderText="Group Name" Width="230"></GridColumn>
+                    <GridColumn Field="@nameof(CustomerGroup.DiscountPercent)" HeaderText="Discount Percent" TextAlign="TextAlign.Center"></GridColumn>
+
+                    <GridColumn HeaderText="Manage" Width="120" AllowFiltering="false" TextAlign="TextAlign.Center" IsFrozen="true">
+                        <GridCommandColumns>
+                            <GridCommandColumn Type="CommandButtonType.Edit" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-edit", CssClass = "e-flat" })"></GridCommandColumn>
+                            <GridCommandColumn Type="CommandButtonType.Delete" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-delete", CssClass = "e-flat" })"></GridCommandColumn>
+                            <GridCommandColumn Type="CommandButtonType.Save" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-update", CssClass = "e-flat" })"></GridCommandColumn>
+                            <GridCommandColumn Type="CommandButtonType.Cancel" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-cancel-icon", CssClass = "e-flat" })"></GridCommandColumn>
+                        </GridCommandColumns>
+                    </GridColumn>
+                </GridColumns>
+                <GridEvents TValue="CustomerGroup" OnActionBegin="ActionBeginCustomerGroup"></GridEvents>
+            </SfGrid>
+        </div>
+    </div>
+</div>
+
+
+@code {
+
+    public List<CustomerGroup> CustomerGroups { get; set; }
+    public CustomerGroup CustomerGroup { get; set; }
+
+    public string[] ToolbarItems { get; set; } = new string[] { "Add" };
+
+    protected override void OnInitialized()
+    {
+        CustomerGroups = _context.CustomerGroups.ToList();
+    }
+
+    public void ActionBeginCustomerGroup(ActionEventArgs<CustomerGroup> arg)
+    {
+        // Save function
+        if (arg.RequestType.Equals(Syncfusion.Blazor.Grids.Action.Save))
+        {
+            if (arg.Data.Id == 0)
+                _context.CustomerGroups.Add(arg.Data);
+
+            if (arg.Data.Id != 0)
+            {
+                var customerGroup = _context.CustomerGroups.FirstOrDefault(c => c.Id == arg.Data.Id);
+
+                if (customerGroup != null)
+                {
+                    customerGroup.Name = arg.Data.Name;
+                    customerGroup.DiscountPercent = arg.Data.DiscountPercent;
+                    _context.CustomerGroups.Update(customerGroup);
+                    Console.WriteLine($"Successfully updated {customerGroup.Name}");
+                }
+            }
+            _context.SaveChanges();
+        }
+
+
+        // Delete Action
+        if (arg.RequestType.Equals(Syncfusion.Blazor.Grids.Action.Delete))
+        {
+            if (arg.Data != null)
+            {
+                _context.CustomerGroups.Remove(arg.Data);
+                _context.SaveChanges();
+            }
+
+            if (arg.Data == null)
+            {
+                Console.WriteLine("Null Delete object, could not remove from DB");
+            }
+        }
+    }
+}

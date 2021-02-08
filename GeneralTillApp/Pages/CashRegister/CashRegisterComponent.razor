@@ -1,7 +1,186 @@
 ﻿@page "/cashregister"
 
-<h3>CashRegisterComponent</h3>
+@inject ApplicationDbContext _context
+<!--Add a horizontal toolbar to allow for refunds, etc.-->
+
+<h3>Cash Register</h3>
+
+<!-- Cash register options -->
+<div class="card row">
+
+</div>
+
+<!-- Cash Register Controls -->
+<div>
+    <div class="row">
+
+        <!-- Qty Form Area  -->
+        <div class="col-1">
+            <label>Qty</label>
+            <input @bind-value="Quantity" @bind-value:event="oninput" class="form-control" />
+        </div>
+
+        <!-- UPC input -->
+        <div style="width:56.35%">
+            <label>UPC</label>
+            <input @bind-value="UPC"
+                   @bind-value:event="oninput"
+                   @onkeypress="(KeyboardEventArgs arg) => { if (arg.Key == StaticMembers.EnterKey) { CheckUPC(); } }"
+                   class="form-control" />
+        </div>
+    </div>
+
+    <br />
+
+    <div class="row">
+        <div style="width:65%">
+            <SfGrid @ref="SfGrid" DataSource="CartItems">
+                <GridColumns>
+                    <GridColumn Field="Product.Title" HeaderText="Product"></GridColumn>
+                    <GridColumn Field="Product.UPC" HeaderText="UPC"></GridColumn>
+                    <GridColumn Field="Product.Cost" HeaderText="Price($)" Format="c" TextAlign="TextAlign.Center"></GridColumn>
+                    <GridColumn Field="Count" TextAlign="TextAlign.Center"></GridColumn>
+                    <GridColumn Field="@nameof(CartItem.ItemSubtotal)" HeaderText="Item Subtotal" Format="c" TextAlign="TextAlign.Center"></GridColumn>
+                </GridColumns>
+            </SfGrid>
+        </div>
+
+
+        <!-- Right hand total display -->
+        <div class="card" style="margin:0 0 0 15px; width:200px; padding:15px">
+            <div style="margin:10px 0 0 0">
+                <label>Subtotal</label>
+                <a class="form-control">@Transaction.SubTotal.ToString("c")</a>
+            </div>
+            <br />
+            <div>
+                <label>GST</label>
+                <a class="form-control">@Transaction.Tax.GST.ToString("c")</a>
+            </div>
+            <br />
+            <div>
+                <label>GST</label>
+                <a class="form-control">@Transaction.Tax.PST.ToString("c")</a>
+            </div>
+            <br />
+            <div>
+                <label>Total</label>
+                <a class="form-control">@Transaction.Total.ToString("c")</a>
+            </div>
+            <br />
+        </div>
+    </div>
+
+</div>
+
 
 @code {
 
+    #region Properties
+
+    public ObservableCollection<CartItem> CartItems { get; set; }
+    public Transaction Transaction { get; set; }
+    public SfGrid<CartItem> SfGrid { get; set; }
+
+    private int Quantity { get; set; }
+    private bool Duplicate { get; set; }
+
+    private string _UPC;
+
+    public string UPC
+    {
+        get { return _UPC; }
+        set
+        {
+            _UPC = value;
+            if (_UPC.Length >= 12)
+                CheckUPC();
+        }
+    }
+
+    #endregion
+
+    #region Initialize
+
+
+    protected override void OnInitialized()
+    {
+        Quantity = 1;
+        CartItems = new ObservableCollection<CartItem>();
+        Transaction = new Transaction() { Tax = new Tax() };
+    }
+
+    #endregion
+
+    #region Methods
+
+    /// <summary>
+    /// Checks to see if input UPC exists in the system, if so, add to current transaction cart
+    /// </summary>
+    public void CheckUPC()
+    {
+        var cartItem = new CartItem();
+        cartItem.Product = _context.Products.FirstOrDefault(p => p.UPC == UPC);
+
+        if (cartItem.Product != null)
+            AddToCart(cartItem);
+        else
+            Console.WriteLine($"Could not find item with UPC : {UPC}");
+    }
+
+    /// <summary>
+    /// Add a cart item to the observable list, update the grid and any values that were changed with the addition
+    /// </summary>
+    /// <param name="cartItem">Cart item found by CheckUPC</param>
+
+    public void AddToCart(CartItem cartItem)
+    {
+        cartItem.Count = Quantity;
+
+        if (CartItems.Contains(CartItems.Where(c => c.Product.UPC == cartItem.Product.UPC).FirstOrDefault()))
+        {
+            var index = CartItems.IndexOf(CartItems.Where(c => c.Product.UPC == cartItem.Product.UPC).FirstOrDefault());
+            CartItems[index].Count += cartItem.Count;
+            Duplicate = true;
+        }
+
+        // If the item that was scanned is already in cart, follow this flow
+        if (Duplicate)
+        {
+            Transaction.SubTotal = 0;
+
+            // Reset and add new subtotal
+            foreach (var item in CartItems)
+            {
+                Transaction.SubTotal += item.Product.Cost * item.Count;
+                item.ItemSubtotal = item.Product.Cost * item.Count;
+            }
+
+            // Calculate the taxes
+            Transaction.Tax.GST = Transaction.SubTotal * 0.05;
+            Transaction.Tax.PST = Transaction.SubTotal * 0.07;
+            Transaction.Total = Transaction.SubTotal + Transaction.Tax.GST + Transaction.Tax.PST;
+        }
+
+        // If the scanned item is new, follow this flow
+        if (!Duplicate)
+        {
+            CartItems.Add(cartItem);
+            cartItem.ItemSubtotal = cartItem.Product.Cost * cartItem.Count;
+            Transaction.SubTotal += cartItem.Product.Cost * Quantity;
+            Transaction.Tax.GST = Transaction.SubTotal * 0.05;
+            Transaction.Tax.PST = Transaction.SubTotal * 0.07;
+            Transaction.Total = Transaction.SubTotal + Transaction.Tax.GST + Transaction.Tax.PST;
+        }
+
+
+        // Reset the item scan variables
+        Quantity = 1;
+        UPC = string.Empty;
+
+        SfGrid.Refresh();
+        StateHasChanged();
+    }
+
+    #endregion
 }
