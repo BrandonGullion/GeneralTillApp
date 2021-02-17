@@ -26,6 +26,7 @@
             TValue="Product"
             Width="1400px"
             AllowFiltering="true">
+
         <GridEditSettings AllowDeleting="true"
                           AllowEditing="true"
                           AllowEditOnDblClick="true"
@@ -34,41 +35,41 @@
 
         <GridColumns>
             <GridColumn Field="@nameof(Product.Id)" IsPrimaryKey="true" Visible="false"></GridColumn>
-            <GridColumn Field="@nameof(Product.Title)"></GridColumn>
+            <GridColumn Field="@nameof(Product.Title)" Width="200px"></GridColumn>
             <GridColumn Field="@nameof(Product.Description)"></GridColumn>
             <GridColumn Field="@nameof(Product.UPC)"></GridColumn>
-            <GridColumn Field="@nameof(Product.OnHand)" HeaderText="On Hand" Width="100" TextAlign="TextAlign.Center"></GridColumn>
-            <GridColumn Field="@nameof(Product.OnOrder)" HeaderText="On Order" Width="100" TextAlign="TextAlign.Center"></GridColumn>
+            <GridColumn Field="@nameof(Product.OnHand)" HeaderText="On Hand" Width="100" HeaderTextAlign="TextAlign.Center" TextAlign="TextAlign.Center"></GridColumn>
+            <GridColumn Field="@nameof(Product.OnOrder)" HeaderText="On Order" Width="110" HeaderTextAlign="TextAlign.Center" TextAlign="TextAlign.Center"></GridColumn>
             <GridColumn Field="@nameof(Product.AcqCost)" HeaderText="Acq. Cost" Width="120" TextAlign="TextAlign.Center" Format="c"></GridColumn>
             <GridColumn Field="@nameof(Product.Cost)" HeaderText="Retail Cost" Width="120" TextAlign="TextAlign.Center" Format="c"></GridColumn>
             <GridColumn Field="ProductGroup.Name" HeaderText="Product Group" EditType="EditType.DropDownEdit">
                 <EditTemplate>
-                    <SfDropDownList TValue="ProductGroup" 
-                                    TItem="ProductGroup" 
-                                    DataSource="@ProductGroups" 
+                    <SfDropDownList TValue="ProductGroup"
+                                    TItem="ProductGroup"
+                                    DataSource="@ProductGroups"
                                     Placeholder="Select Group"
                                     @bind-Value="((context as Product).ProductGroup)">
                     </SfDropDownList>
                 </EditTemplate>
             </GridColumn>
-            <GridColumn Field="@nameof(Product.Discountable)" DisplayAsCheckBox="true" TextAlign="TextAlign.Center"></GridColumn>
-            <GridColumn Field="@nameof(Product.PST)" DisplayAsCheckBox="true" TextAlign="TextAlign.Center"></GridColumn>
-            <GridColumn Field="@nameof(Product.GST)" DisplayAsCheckBox="true" TextAlign="TextAlign.Center"></GridColumn>
-            <GridColumn Field="@nameof(Product.ShelfMin)" HeaderText="Shelf Min" Width="120" TextAlign="TextAlign.Center"></GridColumn>
-            <GridColumn Field="@nameof(Product.ShelfMax)" HeaderText="Shelf Max" Width="120" TextAlign="TextAlign.Center"></GridColumn>
-            <GridColumn Field="@nameof(Product.UnitSize)" HeaderText="Unit Size" Width="120" TextAlign="TextAlign.Center"></GridColumn>
-            <GridColumn Field="UnitOfMeasure.Name" HeaderText="Unit of Measure">
+            <GridColumn Field="@nameof(Product.Discountable)" DisplayAsCheckBox="true" Width="100px" HeaderText="Discount" HeaderTextAlign="TextAlign.Center" TextAlign="TextAlign.Center"></GridColumn>
+            <GridColumn Field="@nameof(Product.PST)" DisplayAsCheckBox="true" Width="70px" HeaderTextAlign="TextAlign.Center" TextAlign="TextAlign.Center"></GridColumn>
+            <GridColumn Field="@nameof(Product.GST)" DisplayAsCheckBox="true" Width="70px" HeaderTextAlign="TextAlign.Center" TextAlign="TextAlign.Center"></GridColumn>
+            <GridColumn Field="@nameof(Product.ShelfMin)" HeaderText="Shelf Min" Width="120" HeaderTextAlign="TextAlign.Center" TextAlign="TextAlign.Center"></GridColumn>
+            <GridColumn Field="@nameof(Product.ShelfMax)" HeaderText="Shelf Max" Width="120" HeaderTextAlign="TextAlign.Center" TextAlign="TextAlign.Center"></GridColumn>
+            <GridColumn Field="@nameof(Product.UnitSize)" HeaderText="Unit Size" Width="100" HeaderTextAlign="TextAlign.Center" TextAlign="TextAlign.Center"></GridColumn>
+            <GridColumn Field="UnitOfMeasure.Name" Width="150" HeaderText="Unit of Measure">
                 <EditTemplate>
                     <SfDropDownList TValue="UnitOfMeasure"
                                     TItem="UnitOfMeasure"
-                                    DataSource="@UnitOfMeasures" 
+                                    DataSource="@UnitOfMeasures"
                                     @bind-Value="(context as Product).UnitOfMeasure"
                                     Placeholder="Select Unit Type">
                     </SfDropDownList>
                 </EditTemplate>
             </GridColumn>
-            <GridColumn Field="@nameof(Product.DateAdded)" HeaderText="Date Added" Format="d" TextAlign="TextAlign.Center"></GridColumn>
-            <GridColumn Field="@nameof(Product.LastEdited)" HeaderText="Last Edited" Format="d"  TextAlign="TextAlign.Center"></GridColumn>
+            <GridColumn Field="@nameof(Product.DateAdded)" HeaderText="Date Added" Format="d" Width="120px" HeaderTextAlign="TextAlign.Center" TextAlign="TextAlign.Center"></GridColumn>
+            <GridColumn Field="@nameof(Product.LastEdited)" HeaderText="Last Edited" Format="d" Width="120px" HeaderTextAlign="TextAlign.Center" TextAlign="TextAlign.Center"></GridColumn>
 
             <GridColumn HeaderText="Manage" Width="120" AllowFiltering="false" IsFrozen="true" TextAlign="TextAlign.Center" HeaderTextAlign="TextAlign.Center">
                 <GridCommandColumns>
@@ -81,7 +82,31 @@
         </GridColumns>
         <GridEvents TValue="Product" OnActionBegin="ActionBeginProduct"></GridEvents>
     </SfGrid>
+    <style>
+        .e-grid {
+            border-radius: 10px;
+        }
+
+            .e-grid .e-headercell {
+                background-color: #262b2f;
+            }
+
+        .e-gridheader {
+            border-radius: 5px;
+        }
+
+        .e-headercell {
+            color: white;
+        }
+    </style>
 </div>
+
+<style>
+    .e-gridheader{
+        background-color:blue;
+    }
+
+</style>
 
 @code {
 
@@ -99,6 +124,9 @@
     public NotificationOption NotifOption { get; set; }
     public SfToast ToastNotification { get; set; }
 
+    public SfGrid<Product> Grid { get; set; }
+
+
 
     #endregion
 
@@ -115,6 +143,7 @@
         Products = new ObservableCollection<Product>(_context.Products.Include(p => p.ProductGroup).Include(p => p.UnitOfMeasure).ToList());
         UnitOfMeasures = new ObservableCollection<UnitOfMeasure>(_context.UnitOfMeasures.ToList());
         ProductGroups = new ObservableCollection<ProductGroup>(_context.ProductGroups.ToList());
+
 
         // Generate Required Toast
         if (_stateManager.NotificationManager.Status == NotificationManager.NotificationStatus.Success ||

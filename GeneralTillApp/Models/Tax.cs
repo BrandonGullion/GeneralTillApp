@@ -11,6 +11,8 @@ namespace GeneralTillApp.Models
         public int Id { get; set; }
         public double PST { get; set; }
         public double GST { get; set; }
+        public double CartGST { get; set; }
+        public double CartPST { get; set; }
 
     }
 }

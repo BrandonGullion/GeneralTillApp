@@ -1,0 +1,232 @@
+﻿:root {
+    --gradientDarkBlue: #000428;
+    --gradientBlue: #004e92;
+    --blueCharcoal: #262b2f;
+    --charcoalHover: #3a4147;
+    --goldHover: #d4aa37;
+    --lightGray: #ced4da;
+}
+
+
+.custom-dropdown {
+    height: 3em;
+    background-color: var(--blueCharcoal);
+    display: flex;
+    justify-content: left;
+    align-items: center;
+}
+
+
+.custom-dropdown-item {
+    position: relative;
+    width: 130px;
+    margin: 0 10px 0 10px;
+}
+
+.custom-dropdown-item-hover:hover {
+    color: var(--goldHover);
+}
+
+.custom-dropdown-item ul {
+    background-color: var(--blueCharcoal);
+    padding: 0px;
+    position: absolute;
+    width: 200px;
+    height: 150px;
+    display: flex;
+    margin-top: 15px;
+    justify-content: space-around;
+    align-items: center;
+    flex-direction: column;
+    list-style: none;
+    border-radius: 5px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.3s ease;
+    z-index: 5;
+}
+
+.custom-dropdown-item li {
+    width: 100%;
+    height: 100%
+}
+
+.custom-dropdown-item a {
+    color: white;
+    text-decoration: none;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-content: center;
+    justify-content: center;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+.custom-dropdown-item li:hover {
+    background-color: var(--charcoalHover);
+}
+
+.custom-dropdown button {
+    background: none;
+    border: none;
+    width: 100%;
+    height: 100%;
+    color: white;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+    .custom-dropdown button:hover {
+        color: var(--goldHover);
+    }
+
+    .custom-dropdown button:focus + ul {
+        opacity: 1;
+        visibility: visible;
+        transform: translateX(0px);
+    }
+
+.GeneralTillLogo {
+    color: white;
+    font-size: 18px;
+    display: flex;
+    margin-top: 10px;
+    align-content: center;
+    justify-content: center;
+    width: 200px;
+}
+
+.loginDisplay {
+    display: flex;
+    justify-content: center;
+    align-content: center;
+}
+
+.loginWelcome {
+    color: white;
+    font-size: 16px;
+    margin-top: 8px;
+    margin-right: 10px;
+}
+
+.registerUserText {
+    color: white;
+    font-size: 16px;
+    margin-top: 8px;
+    margin-left: 10px;
+    margin-right: 10px;
+    text-decoration: none;
+}
+
+.registerUserText-Hover:hover {
+    color: var(--goldHover);
+    text-decoration: none;
+}
+
+.cashregister-toolbar {
+    display: flex;
+    justify-content: center;
+    align-content: space-around;
+    border: 1px solid var(--lightGray);
+    border-radius: 100px;
+    width: 65%;
+    margin-bottom: 10px;
+}
+
+    .cashregister-toolbar button {
+        background-color: var(--blueCharcoal);
+        height: 100px;
+        width: 100px;
+        border: none;
+        padding: 10px;
+        margin: 10px;
+        font-size: 14px;
+        cursor: pointer;
+        color: white;
+        border-radius: 50px;
+    }
+
+        .cashregister-toolbar button:hover {
+            background-color: var(--charcoalHover);
+            color: var(--goldHover);
+        }
+
+    .cashregister-toolbar i {
+        font-size: 30px;
+        display: flex;
+        justify-content: center;
+        align-content: center;
+        margin-top: 15px;
+        margin-bottom: 5px;
+    }
+
+.custom-dialog-confirm-header {
+    background-color: var(--blueCharcoal);
+    color: white;
+}
+
+.custom-dialog {
+    position: absolute;
+    transform: translate(-250px,100px);
+}
+
+.customer-dialog-container{
+    height:100%;
+    width:100%;
+    left:0;
+    right:0;
+    overflow:auto;
+    position:fixed;
+}
+
+.customer-dialog-content{
+    background-color:red;
+    border-radius:3px;
+    height:100%;
+    width:100%;
+}
+
+.cashregister-customer-widget{
+    background-color:var(--blueCharcoal);
+    display:flex;
+    justify-content:space-around;
+    align-content:center;
+    color:white;
+    height:40px;
+    width:40%;
+    margin-top:10px;
+    margin-bottom:10px;
+    border-radius:3px;
+}
+
+.cashregister-customer-widget a{
+    margin-top:7px;
+}
+
+.e-dialog {
+    border: none;
+    background: none;
+}
+
+    .e-dialog .e-dlg-header-content {
+        background-color: #262b2f;
+    }
+
+    .e-dialog .e-dlg-header {
+        color: white;
+        font-size: 20px;
+        font-weight: normal;
+    }
+
+    .custom-label-squoval{
+        background-color:var(--blueCharcoal);
+        width:80px;
+        padding:5px;
+        border-radius:30px;
+        color:white;
+        display:flex;
+        justify-content:center;
+        align-content:center;
+    }

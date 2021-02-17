@@ -1,0 +1,83 @@
+﻿
+@inject ApplicationDbContext _context
+
+@if (ShowDialog)
+{
+    <div class="modal fade show d-block custom-dialog"
+         style="margin-top:100px;"
+         id="exampleModal"
+         tabindex="-1"
+         role="dialog"
+         aria-labelledby="exampleModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header custom-dialog-confirm-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Select A Customer</h5>
+                    <button @onclick="() => { ShowDialog = false; }" type="button" style="color:white" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+
+                    <SfGrid TValue="Customer" AllowFiltering="true" AllowSelection="true" DataSource="Customers" Height="200px">
+                        <GridSelectionSettings Type="SelectionType.Single"></GridSelectionSettings>
+                        <GridEvents RowSelected="GetSelectedRow" TValue="Customer"></GridEvents>
+                        <GridColumns>
+                            <GridColumn Field="@nameof(Customer.Id)" Visible="false"></GridColumn>
+                            <GridColumn Field="@nameof(Customer.CustomerCode)"></GridColumn>
+                            <GridColumn Field="@nameof(Customer.FirstName)"></GridColumn>
+                            <GridColumn Field="@nameof(Customer.LastName)"></GridColumn>
+                        </GridColumns>
+                    </SfGrid>
+
+
+                </div>
+                <div class="modal-footer">
+                    <button @onclick="() => { ShowDialog = false; }" type="button" class="btn btn-secondary" data-dismiss="modal">
+                        Cancel
+                    </button>
+                    <button @onclick="OnCustomerSelect" type="button" class="btn btn-primary">
+                        Select
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code{
+
+    [Parameter]
+    public EventCallback<Customer> CustomerSelect { get; set; }
+    public Customer SelectedCustomer { get; set; }
+    public bool ShowDialog { get; set; }
+    public List<Customer> Customers { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        ShowDialog = false;
+        Customers = await _context.Customers.ToListAsync();
+    }
+
+    public void GetSelectedRow(RowSelectEventArgs<Customer> arg)
+    {
+        SelectedCustomer = arg.Data;
+    }
+
+    public void Show()
+    {
+        ShowDialog = true;
+        StateHasChanged();
+    }
+
+    public async Task OnCustomerSelect()
+    {
+        if (SelectedCustomer != null)
+        {
+            ShowDialog = false;
+            await CustomerSelect.InvokeAsync(SelectedCustomer);
+        }
+    }
+
+}

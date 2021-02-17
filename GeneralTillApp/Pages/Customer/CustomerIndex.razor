@@ -13,7 +13,8 @@
     <SfGrid DataSource="Customers"
             TValue="Customer"
             Width="1400px"
-            AllowFiltering="true">
+            AllowFiltering="true"
+            @ref="SFGrid">
         <GridEditSettings AllowDeleting="true"
                           AllowEditing="true"
                           AllowEditOnDblClick="true">
@@ -21,6 +22,7 @@
 
         <GridColumns>
             <GridColumn Field="@nameof(Customer.Id)" IsPrimaryKey="true" Visible="false"></GridColumn>
+            <GridColumn Field="@nameof(Customer.CustomerCode)"></GridColumn>
             <GridColumn Field="@nameof(Customer.FirstName)"></GridColumn>
             <GridColumn Field="@nameof(Customer.LastName)"></GridColumn>
             <GridColumn Field="CustomerGroup.Name" HeaderText="Product Group">
@@ -56,6 +58,25 @@
         </GridColumns>
         <GridEvents TValue="Customer" OnActionBegin="ActionBeginCustomer"></GridEvents>
     </SfGrid>
+
+    <style>
+        .e-grid{
+            border-radius:10px;
+        }
+
+        .e-grid .e-headercell {
+            background-color: #262b2f;
+        }
+
+        .e-gridheader{
+            border-radius:5px;
+        }
+
+        .e-headercell{
+            color:white;
+        }
+    </style>
+
 </div>
 
 
@@ -68,6 +89,7 @@
     public SfToast ToastNotification { get; set; }
 
     public CustomerGroup PreviouslyEditedCustomerGroup { get; set; }
+    public SfGrid<Customer> SFGrid { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -115,6 +137,7 @@
                 customer.ARLimit = arg.Data.ARLimit;
                 customer.LastEdited = DateTime.Now;
                 customer.DiscountPercent = arg.Data.DiscountPercent;
+                customer.CustomerCode = arg.Data.CustomerCode;
 
                 // Quick fix for the issue of the group being null 
                 if (customer.CustomerGroup == null)

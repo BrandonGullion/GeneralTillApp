@@ -1,0 +1,79 @@
+﻿
+@if (ShowDialog)
+{
+    <div class="modal d-block custom-dialog"
+         style="margin-top:100px;">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header custom-dialog-confirm-header">
+                    <h5 class="modal-title">Adjust</h5>
+                    <button @onclick="() => { ShowDialog = false; }" type="button" style="color:white" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+
+                    <SfGrid TValue="CartItem" DataSource="CartItems">
+                        <GridEditSettings AllowEditOnDblClick="true"></GridEditSettings>
+                        <GridColumns>
+                            <GridColumn Field="Product.Title"></GridColumn>
+                            <GridColumn Field="Product.Cost"></GridColumn>
+                            <GridColumn Field="Product.DiscountPercent" HeaderText="Adjust %" AllowEditing="true"></GridColumn>
+                            <GridColumn  HeaderText="Adjust $">
+                                <Template>
+                                    @{
+                                        var cartItem = (context as CartItem);
+                                        <input @bind-value="cartItem.DiscountAmount" />
+                                    }
+                                </Template>
+                            </GridColumn>
+                            <GridColumn Field="Product.Cost" HeaderText="Adjust Cost" AllowEditing="true"></GridColumn>
+                            <GridColumn>
+                                <Template>
+                                    <input />
+                                </Template>
+                            </GridColumn>
+                        </GridColumns>
+                    </SfGrid>
+
+                </div>
+                <div class="modal-footer">
+                    <button @onclick="() => { ShowDialog = false; }" type="button" class="btn btn-secondary" data-dismiss="modal">
+                        Cancel
+                    </button>
+                    <button @onclick="OnAdjustComplete" type="button" class="btn btn-primary">
+                        Select
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+
+    public bool ShowDialog { get; set; } = false;
+
+    [Parameter]
+    public ObservableCollection<CartItem> CartItems { get; set; }
+
+    [Parameter]
+    public EventCallback<ObservableCollection<CartItem>> AdjustComplete { get; set; }
+
+    protected override void OnInitialized()
+    {
+        CartItems = new ObservableCollection<CartItem>();
+    }
+
+    public void Show()
+    {
+        ShowDialog = true;
+    }
+
+    public async Task OnAdjustComplete()
+    {
+        ShowDialog = false;
+        await AdjustComplete.InvokeAsync(CartItems);
+    }
+
+}

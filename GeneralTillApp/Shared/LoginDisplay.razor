@@ -7,10 +7,10 @@
 
 <AuthorizeView>
     <Authorized>
-        <a>Welcome, @context.User.Identity.Name!</a>
-        <a href="Identity/Account/Register">Register New User</a>
+        <a class="loginWelcome" style="color:white"><i class="far fa-user-circle" style="color:white"></i>&nbsp; @context.User.Identity.Name!</a>
+        <a class="registerUserText registerUserText-Hover" href="Identity/Account/Register">Register New User</a>
         <form method="post" action="Identity/Account/LogOut">
-            <button type="submit" class="nav-link btn btn-link">Log out</button>
+            <button type="submit" class="nav-link btn btn-link" style="margin-top:0px">Log out</button>
         </form>
     </Authorized>
     <NotAuthorized>

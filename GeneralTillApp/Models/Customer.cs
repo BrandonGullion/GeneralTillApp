@@ -19,7 +19,9 @@ namespace GeneralTillApp.Models
         [Required]
         [Display(Name = "Last Name")]
         public string LastName { get; set; }
-        
+
+        public string CustomerCode { get; set; }
+
         [Display(Name = "Address")]
         public string StreetAddress { get; set; }
         public string City { get; set; }

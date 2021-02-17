@@ -1,15 +1,58 @@
 ﻿@inherits LayoutComponentBase
+@inject NavigationManager _navManager
 
-<div class="sidebar">
-    <NavMenu />
-</div>
+<div class="main" style="z-index:5; padding:0px">
+    <!-- Top Menu Bar -->
+    <nav>
+        <div class="custom-dropdown">
+            <div class="GeneralTillLogo">
+                <label>General Till</label>
+            </div>
 
-<div class="main">
-    <div class="top-row px-4 auth">
-        <LoginDisplay />
-    </div>
+            <div class="custom-dropdown-item custom-dropdown-item-hover">
+                <a class="custom-dropdown-item-hover" style="margin-top:0" href="/">Home</a>
+            </div>
 
+            <div class="custom-dropdown-item">
+                <a class="custom-dropdown-item-hover" style="margin-top:0px" href="/cashregister">Cash Register</a>
+            </div>
+
+            <div class="custom-dropdown-item">
+                <button>Products</button>
+                <ul>
+                    <li><a href="/product">All Products</a></li>
+                    <li><a href="/product/add">Add Product</a></li>
+                    <li><a @onclick="Navigate" href="">Product Settings</a></li>
+                </ul>
+            </div>
+
+            <div class="custom-dropdown-item">
+                <button>Customers</button>
+                <ul>
+                    <li><a href="/customer">All Customers</a></li>
+                    <li><a href="/customer/add">Add Customer</a></li>
+                    <li><a href="/customer/settings">Customer Settings</a></li>
+                </ul>
+            </div>
+
+            <div style="width:35%"></div>
+
+            <div class="loginDisplay">
+                <LoginDisplay></LoginDisplay>
+            </div>
+        </div>
+    </nav>
     <div class="content px-4">
         @Body
     </div>
 </div>
+
+@code{
+
+    public void Navigate()
+    {
+        _navManager.NavigateTo("/product/settings");
+    }
+
+}
+

@@ -1,0 +1,59 @@
+﻿@inject ApplicationDbContext _context 
+
+@if(CustomerDialogVisibility){
+<!-- Customer Dialog -->
+<SfDialog @ref="SfDialog" Width="1000px" IsModal="true">
+    <DialogTemplates>
+        <Header>Select A Customer</Header>
+        <Content>
+            <SfGrid TValue="Customer" AllowFiltering="true" AllowSelection="true" DataSource="Customers" Height="200px">
+                <GridSelectionSettings Type="SelectionType.Single"></GridSelectionSettings>
+                <GridEvents RowSelected="(RowSelectEventArgs<Customer> arg) => SelectedCustomer = arg.Data" TValue="Customer"></GridEvents>
+                <GridColumns>
+                    <GridColumn Field="@nameof(Customer.Id)" Visible="false"></GridColumn>
+                    <GridColumn Field="@nameof(Customer.CustomerCode)"></GridColumn>
+                    <GridColumn Field="@nameof(Customer.FirstName)"></GridColumn>
+                    <GridColumn Field="@nameof(Customer.LastName)"></GridColumn>
+                </GridColumns>
+            </SfGrid>
+        </Content>
+    </DialogTemplates>
+    <DialogButtons>
+        <DialogButton Content="Close" OnClick="() => { Close();  }"></DialogButton>
+    </DialogButtons>
+</SfDialog>
+}
+
+
+
+
+@code { 
+
+    [Parameter] public List<Customer> Customers { get; set; }
+
+    [Parameter] public bool CustomerDialogVisibility { get; set; }
+
+    [Parameter] public EventCallback DialogClosed { get; set; }
+
+    public Customer SelectedCustomer { get; set; }
+
+    public SfDialog SfDialog { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Customers = await _context.Customers.ToListAsync();
+    }
+
+    private void Close()
+    {
+        CustomerDialogVisibility = false;
+        SfDialog.Hide();
+    }
+
+
+
+}
+
+
+
+

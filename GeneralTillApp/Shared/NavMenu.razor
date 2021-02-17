@@ -1,108 +1,103 @@
 ﻿@using GeneralTillApp.Data
 @inject ApplicationDbContext _context
 
-<div class="top-row pl-4 navbar navbar-dark">
-    <a class="navbar-brand" href="">GeneralTill</a>
-    <button class="navbar-toggler" @onclick="ToggleNavMenu">
-        <span class="navbar-toggler-icon"></span>
-    </button>
-</div>
+<nav class="navbar navbar-expand-sm navbar-light">
+    <div class="@NavMenuCssClass navbar" @onclick="ToggleNavMenu">
+        <ul class="navbar-nav flex-grow-1">
+            <li class="nav-item px-3">
+                <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+                    <i class="fas fa-home" style="font-size: 20px; margin-right:1em"></i> Home
+                </NavLink>
+            </li>
 
-<div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
-    <ul class="nav flex-column">
-        <li class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <i class="fas fa-home" style="font-size: 20px; margin-right:1em"></i> Home
-            </NavLink>
-        </li>
+            <li class="nav-item px-3">
+                <NavLink class="nav-link" href="/cashregister" Match="NavLinkMatch.All">
+                    <i class="fas fa-dollar-sign" style="font-size:20px; margin-right:1em"></i> Cash Register
+                </NavLink>
+            </li>
 
-        <li class="nav-item px-3">
-            <NavLink class="nav-link" href="/cashregister" Match="NavLinkMatch.All">
-                <i class="fas fa-dollar-sign" style="font-size:20px; margin-right:1em"></i> Cash Register
-            </NavLink>
-        </li>
-
-        @if (User != null)
-        {
-            @if (User.UserRole == StaticMembers.Role_Admin || User.UserRole == StaticMembers.Role_Management)
+            @if (User != null)
             {
-                <!-- Product Nav Menu Dropdown-->
-                <li class="nav-item px-3">
-                    <NavLink @onclick="() => expandMenu = !expandMenu"
-                             class="nav-link px-3"
-                             style="cursor:pointer">
-                        @if (!expandMenu)
-                        {<i class="far fa-caret-square-right" style="font-size:20px; margin-right:1em"></i>}
+                @if (User.UserRole == StaticMembers.Role_Admin || User.UserRole == StaticMembers.Role_Management)
+                {
+                    <!-- Product Nav Menu Dropdown-->
+                    <li class="nav-item px-3">
+                        <NavLink @onclick="() => expandMenu = !expandMenu"
+                                 class="nav-link px-3"
+                                 style="cursor:pointer">
+                            @if (!expandMenu)
+                            {<i class="far fa-caret-square-right" style="font-size:20px; margin-right:1em"></i>}
+                            @if (expandMenu)
+                            {<i class="far fa-caret-square-down" style="font-size:20px; margin-right:1em"></i>}
+                            Products
+                        </NavLink>
                         @if (expandMenu)
-                        {<i class="far fa-caret-square-down" style="font-size:20px; margin-right:1em"></i>}
-                        Products
-                    </NavLink>
-                    @if (expandMenu)
-                    {
-                        <ul>
-                            <li class="nav-item">
-                                <NavLink class="nav-link" style="cursor:pointer" href="/product">
-                                    <i class="far fa-square" style="font-size:15px"></i>
-                                    &nbsp;&nbsp;All Products
-                                </NavLink>
-                            </li>
-                            <li class="nav-item">
-                                <NavLink class="nav-link" style="cursor:pointer" href="/product/addproduct">
-                                    <i class="far fa-square" style="font-size:15px"></i>
-                                    &nbsp;&nbsp;Add Product
-                                </NavLink>
-                            </li>
-                            <li class="nav-item">
-                                <NavLink class="nav-link" style="cursor:pointer" href="/product/settings">
-                                    <i class="far fa-square" style="font-size:15px"></i>
-                                    &nbsp;&nbsp;Product Settings
-                                </NavLink>
-                            </li>
-                        </ul>
+                        {
+                            <ul>
+                                <li class="nav-item">
+                                    <NavLink class="nav-link" style="cursor:pointer" href="/product">
+                                        <i class="far fa-square" style="font-size:15px"></i>
+                                        &nbsp;&nbsp;All Products
+                                    </NavLink>
+                                </li>
+                                <li class="nav-item">
+                                    <NavLink class="nav-link" style="cursor:pointer" href="/product/addproduct">
+                                        <i class="far fa-square" style="font-size:15px"></i>
+                                        &nbsp;&nbsp;Add Product
+                                    </NavLink>
+                                </li>
+                                <li class="nav-item">
+                                    <NavLink class="nav-link" style="cursor:pointer" href="/product/settings">
+                                        <i class="far fa-square" style="font-size:15px"></i>
+                                        &nbsp;&nbsp;Product Settings
+                                    </NavLink>
+                                </li>
+                            </ul>
 
-                    }
-                </li>
+                        }
+                    </li>
 
-                <!-- Customer Nav Menu Dropdown -->
-                <li class="nav-item px-3">
-                    <NavLink @onclick="() => customerExpandMenu = !customerExpandMenu"
-                             class="nav-link px-3"
-                             style="cursor:pointer">
-                        @if (!customerExpandMenu)
-                        {<i class="far fa-caret-square-right" style="font-size:20px; margin-right:1em"></i>}
+                    <!-- Customer Nav Menu Dropdown -->
+                    <li class="nav-item px-3">
+                        <NavLink @onclick="() => customerExpandMenu = !customerExpandMenu"
+                                 class="nav-link px-3"
+                                 style="cursor:pointer">
+                            @if (!customerExpandMenu)
+                            {<i class="far fa-caret-square-right" style="font-size:20px; margin-right:1em"></i>}
+                            @if (customerExpandMenu)
+                            {<i class="far fa-caret-square-down" style="font-size:20px; margin-right:1em"></i>}
+                            Customers
+                        </NavLink>
                         @if (customerExpandMenu)
-                        {<i class="far fa-caret-square-down" style="font-size:20px; margin-right:1em"></i>}
-                        Customers
-                    </NavLink>
-                    @if (customerExpandMenu)
-                    {
-                        <ul>
-                            <li class="nav-item">
-                                <NavLink class="nav-link" style="cursor:pointer" href="/customer">
-                                    <i class="far fa-square" style="font-size:15px"></i>
-                                    &nbsp;&nbsp;All Customers
-                                </NavLink>
-                            </li>
-                            <li class="nav-item">
-                                <NavLink class="nav-link" style="cursor:pointer" href="/customer/add">
-                                    <i class="far fa-square" style="font-size:15px"></i>
-                                    &nbsp;&nbsp;Add Customer
-                                </NavLink>
-                            </li>
-                            <li class="nav-item">
-                                <NavLink class="nav-link" style="cursor:pointer" href="/customer/settings">
-                                    <i class="far fa-square" style="font-size:15px"></i>
-                                    &nbsp;&nbsp;Customer Settings
-                                </NavLink>
-                            </li>
-                        </ul>
+                        {
+                            <ul>
+                                <li class="nav-item">
+                                    <NavLink class="nav-link" style="cursor:pointer" href="/customer">
+                                        <i class="far fa-square" style="font-size:15px"></i>
+                                        &nbsp;&nbsp;All Customers
+                                    </NavLink>
+                                </li>
+                                <li class="nav-item">
+                                    <NavLink class="nav-link" style="cursor:pointer" href="/customer/add">
+                                        <i class="far fa-square" style="font-size:15px"></i>
+                                        &nbsp;&nbsp;Add Customer
+                                    </NavLink>
+                                </li>
+                                <li class="nav-item">
+                                    <NavLink class="nav-link" style="cursor:pointer" href="/customer/settings">
+                                        <i class="far fa-square" style="font-size:15px"></i>
+                                        &nbsp;&nbsp;Customer Settings
+                                    </NavLink>
+                                </li>
+                            </ul>
 
-                    }
-                </li>
+                        }
+                    </li>
+                }
             }
-        }
-    </ul>
-</div>
+        </ul>
+    </div>
+</nav>
 
 
 
