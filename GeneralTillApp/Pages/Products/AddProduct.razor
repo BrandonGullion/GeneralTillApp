@@ -4,124 +4,127 @@
 @inject NavigationManager _navManager 
 @inject ApplicationDbContext _context
 
-<h3>Add Product</h3>
+<div class="PagePadding">
 
-<br />
+    <h3>Add Product</h3>
 
-<EditForm Model="Product" OnValidSubmit="Save">
-    <DataAnnotationsValidator></DataAnnotationsValidator>
+    <br />
 
-    <!-- Name, UPC and Retail price required to make and item -->
-    <div class="row">
-        <div class="col-5">
-            <div>
-                <label class="col-form-label">Name :</label>
-                <InputText class="form-control" @bind-Value="Product.Title"></InputText>
-                <ValidationMessage For="() => Product.Title"></ValidationMessage>
-            </div>
-            <div>
-                <label class="col-form-label">Description : </label>
-                <InputText class="form-control" @bind-Value="Product.Description" ></InputText>
-            </div>
+    <EditForm Model="Product" OnValidSubmit="Save">
+        <DataAnnotationsValidator></DataAnnotationsValidator>
 
-            <!-- Unit of measure row -->
-            <div class="row">
-                <div class="col-3">
-                    <label class="col-form-label">Unit Size</label>
-                    <InputNumber class="form-control" @bind-Value="Product.UnitSize"></InputNumber>
+        <!-- Name, UPC and Retail price required to make and item -->
+        <div class="row">
+            <div class="col-5">
+                <div>
+                    <label class="col-form-label">Name :</label>
+                    <InputText class="form-control" @bind-Value="Product.Title"></InputText>
+                    <ValidationMessage For="() => Product.Title"></ValidationMessage>
+                </div>
+                <div>
+                    <label class="col-form-label">Description : </label>
+                    <InputText class="form-control" @bind-Value="Product.Description"></InputText>
                 </div>
 
-                <div class="col-4">
-                    <label class="col-form-label">Unit of Measure</label>
-                    <select class="custom-select" @bind="Product.UnitOfMeasureId">
-                        @foreach (var unitOfMeasure in unitOfMeasures)
+                <!-- Unit of measure row -->
+                <div class="row">
+                    <div class="col-3">
+                        <label class="col-form-label">Unit Size</label>
+                        <InputNumber class="form-control" @bind-Value="Product.UnitSize"></InputNumber>
+                    </div>
+
+                    <div class="col-4">
+                        <label class="col-form-label">Unit of Measure</label>
+                        <select class="custom-select" @bind="Product.UnitOfMeasureId">
+                            @foreach (var unitOfMeasure in unitOfMeasures)
+                            {
+                                <option value="@unitOfMeasure.Id">@unitOfMeasure.Name</option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="col-5">
+                        <label></label>
+
+                    </div>
+                </div>
+
+                <!-- Select for product groups to apply discounts -->
+                <div>
+                    <label class="col-form-label">Product Group</label>
+                    <select class="custom-select" @bind="Product.ProductGroupId">
+                        @foreach (var productGroup in productGroups)
                         {
-                            <option value="@unitOfMeasure.Id">@unitOfMeasure.Name</option>
+                            <option value="@productGroup.Id">@productGroup.Name</option>
                         }
                     </select>
                 </div>
 
-                <div class="col-5">
-                    <label></label>
+            </div>
 
+            <!-- Right side of the page -->
+            <div class="col-5">
+                <div>
+                    <label class="col-form-label">UPC :</label>
+                    <InputText class="form-control" @bind-Value="Product.UPC"></InputText>
+                    <ValidationMessage For="() => Product.UPC"></ValidationMessage>
+                </div>
+
+                <br />
+
+                <!-- On hand and tax row -->
+                <div class="row">
+                    <div class="col-2">
+                        <label class="col-form-label"> On Hand :</label>
+                    </div>
+                    <InputNumber class="col-2 form-control" @bind-Value="Product.OnHand"></InputNumber>
+
+                    <div class="col-2">
+                        <label class="col-form-label">GST :</label>
+                        <InputCheckbox @bind-Value="Product.GST"></InputCheckbox>
+                    </div>
+                    <div class="col-2">
+                        <label class="col-form-label">
+                            PST :
+                            <InputCheckbox @bind-Value="Product.PST"></InputCheckbox>
+                        </label>
+                    </div>
+                    <div class="col-3">
+                        <label class="col-form-label">
+                            Discountable :
+                            <InputCheckbox @bind-Value="Product.Discountable"></InputCheckbox>
+                        </label>
+                    </div>
+                </div>
+
+                <br />
+
+                <!-- Shelf min/max div row -->
+                <div class="row">
+                    <label class="col-2 col-form-label">Shelf Min:</label>
+                    <InputNumber class="form-control col-2" @bind-Value="Product.ShelfMin"></InputNumber>
+
+                    <label class="col-2 col-form-label">Shelf Max :</label>
+                    <InputNumber class="form-control col-2" @bind-Value="Product.ShelfMax"></InputNumber>
+                </div>
+
+                <br />
+
+                <!-- Acq cost and retail cost row -->
+                <div class="row">
+                    <label class="col-form-label col-3">Purchase Cost : </label>
+                    <InputNumber class="form-control col-2" @bind-Value="Product.AcqCost"></InputNumber>
+
+                    <label class="col-form-label col-2">Retail Cost : </label>
+                    <InputNumber class="form-control col-2" @bind-Value="Product.Cost"></InputNumber>
                 </div>
             </div>
-
-            <!-- Select for product groups to apply discounts -->
-            <div>
-                <label class="col-form-label">Product Group</label>
-                <select class="custom-select" @bind="Product.ProductGroupId">
-                    @foreach(var productGroup in productGroups)
-                    {
-                        <option value="@productGroup.Id">@productGroup.Name</option>
-                    }
-                </select>
-            </div>
-
         </div>
 
-        <!-- Right side of the page -->
-        <div class="col-5">
-            <div>
-                <label class="col-form-label">UPC :</label>
-                <InputText class="form-control" @bind-Value="Product.UPC"></InputText>
-                <ValidationMessage For="() => Product.UPC"></ValidationMessage>
-            </div>
-
-            <br />
-
-            <!-- On hand and tax row -->
-            <div class="row">
-                <div class="col-2">
-                    <label class="col-form-label"> On Hand :</label>
-                </div>
-                <InputNumber class="col-2 form-control" @bind-Value="Product.OnHand"></InputNumber>
-
-                <div class="col-2">
-                    <label class="col-form-label">GST :</label>
-                    <InputCheckbox @bind-Value="Product.GST"></InputCheckbox>
-                </div>
-                <div class="col-2">
-                    <label class="col-form-label">
-                        PST :
-                        <InputCheckbox @bind-Value="Product.PST"></InputCheckbox>
-                    </label>
-                </div>
-                <div class="col-3">
-                    <label class="col-form-label">
-                        Discountable :
-                        <InputCheckbox @bind-Value="Product.Discountable"></InputCheckbox>
-                    </label>
-                </div>
-            </div>
-
-            <br/>
-
-            <!-- Shelf min/max div row -->
-            <div class="row">
-                <label class="col-2 col-form-label">Shelf Min:</label>
-                <InputNumber class="form-control col-2" @bind-Value="Product.ShelfMin"></InputNumber>
-
-                <label class="col-2 col-form-label">Shelf Max :</label>
-                <InputNumber class="form-control col-2" @bind-Value="Product.ShelfMax"></InputNumber>
-            </div>
-
-            <br/>
-
-            <!-- Acq cost and retail cost row -->
-            <div class="row">
-                <label class="col-form-label col-3">Purchase Cost : </label>
-                <InputNumber class="form-control col-2" @bind-Value="Product.AcqCost"></InputNumber>
-
-                <label class="col-form-label col-2">Retail Cost : </label>
-                <InputNumber class="form-control col-2" @bind-Value="Product.Cost"></InputNumber> 
-            </div>
-        </div>
-    </div>
-
-    <br />
-    <button class="btn btn-primary" type="submit">Submit</button>
-</EditForm>
+        <br />
+        <button class="btn btn-primary" type="submit">Submit</button>
+    </EditForm>
+</div>
 
 @code {
 

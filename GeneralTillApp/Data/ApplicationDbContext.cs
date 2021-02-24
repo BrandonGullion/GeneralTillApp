@@ -14,11 +14,12 @@ namespace GeneralTillApp.Data
 
         public DbSet<Customer> Customers { get; set; }
         public DbSet<CustomerGroup> CustomerGroups { get; set; }
+        public DbSet<CartItem> CartItems { get; set; }
 
-        public DbSet<ShoppingCart> ShoppingCarts { get; set; }
         public DbSet<UnitOfMeasure> UnitOfMeasures { get; set; }
         public DbSet<CustomUser> CustomUsers { get; set; }
         public DbSet<Transaction> Transactions { get; set; }
+        public DbSet<Payment> Payments { get; set; }
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)

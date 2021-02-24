@@ -4,14 +4,16 @@ using GeneralTillApp.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace GeneralTillApp.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210222225831_TryingToDeleteRows")]
+    partial class TryingToDeleteRows
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -137,12 +139,17 @@ namespace GeneralTillApp.Data.Migrations
                     b.Property<int?>("ProductId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("TransactionId")
+                        .HasColumnType("int");
+
                     b.Property<string>("TransactionNumber")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("ProductId");
+
+                    b.HasIndex("TransactionId");
 
                     b.ToTable("CartItems");
                 });
@@ -245,7 +252,12 @@ namespace GeneralTillApp.Data.Migrations
                     b.Property<int>("PaymentType")
                         .HasColumnType("int");
 
+                    b.Property<int?>("TransactionId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("TransactionId");
 
                     b.ToTable("Payments");
                 });
@@ -557,6 +569,10 @@ namespace GeneralTillApp.Data.Migrations
                     b.HasOne("GeneralTillApp.Models.Product", "Product")
                         .WithMany()
                         .HasForeignKey("ProductId");
+
+                    b.HasOne("GeneralTillApp.Models.Transaction", null)
+                        .WithMany("CartItems")
+                        .HasForeignKey("TransactionId");
                 });
 
             modelBuilder.Entity("GeneralTillApp.Models.Customer", b =>
@@ -566,6 +582,13 @@ namespace GeneralTillApp.Data.Migrations
                         .HasForeignKey("CustomerGroupId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("GeneralTillApp.Models.Payment", b =>
+                {
+                    b.HasOne("GeneralTillApp.Models.Transaction", null)
+                        .WithMany("Payments")
+                        .HasForeignKey("TransactionId");
                 });
 
             modelBuilder.Entity("GeneralTillApp.Models.Product", b =>

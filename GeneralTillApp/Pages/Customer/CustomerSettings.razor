@@ -1,60 +1,63 @@
 ﻿@page "/customer/settings"
 @inject ApplicationDbContext _context
 
-<h3>Customer Settings</h3>
+<div class="PagePadding">
 
-<div class="card">
-    <div class="row">
-        <div class="col-4">
-            <label class="card-header">Customer Groups</label>
-            <SfGrid DataSource="@CustomerGroups"
-                    AllowSorting="true"
-                    AllowFiltering="true"
-                    EnableHover="true"
-                    Toolbar="ToolbarItems">
-                <GridSortSettings>
-                    <GridSortColumns>
-                        <GridSortColumn Field="@nameof(CustomerGroup.Name)" Direction="SortDirection.Ascending"></GridSortColumn>
-                    </GridSortColumns>
-                </GridSortSettings>
-                <GridEditSettings AllowAdding="true"
-                                  AllowDeleting="true"
-                                  AllowEditing="true"
-                                  AllowEditOnDblClick="true"
-                                  ShowConfirmDialog="true">
-                </GridEditSettings>
-                <GridColumns>
-                    <GridColumn Field="@nameof(CustomerGroup.Name)" HeaderText="Group Name" Width="230"></GridColumn>
-                    <GridColumn Field="@nameof(CustomerGroup.DiscountPercent)" HeaderText="Discount Percent" TextAlign="TextAlign.Center"></GridColumn>
+    <h3>Customer Settings</h3>
 
-                    <GridColumn HeaderText="Manage" Width="120" AllowFiltering="false" TextAlign="TextAlign.Center" IsFrozen="true">
-                        <GridCommandColumns>
-                            <GridCommandColumn Type="CommandButtonType.Edit" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-edit", CssClass = "e-flat" })"></GridCommandColumn>
-                            <GridCommandColumn Type="CommandButtonType.Delete" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-delete", CssClass = "e-flat" })"></GridCommandColumn>
-                            <GridCommandColumn Type="CommandButtonType.Save" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-update", CssClass = "e-flat" })"></GridCommandColumn>
-                            <GridCommandColumn Type="CommandButtonType.Cancel" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-cancel-icon", CssClass = "e-flat" })"></GridCommandColumn>
-                        </GridCommandColumns>
-                    </GridColumn>
-                </GridColumns>
-                <GridEvents TValue="CustomerGroup" OnActionBegin="ActionBeginCustomerGroup"></GridEvents>
-            </SfGrid>
-            <style>
-                .e-grid {
-                    border-radius: 10px;
-                }
+    <div class="card">
+        <div class="row">
+            <div class="col-4">
+                <label class="card-header">Customer Groups</label>
+                <SfGrid DataSource="@CustomerGroups"
+                        AllowSorting="true"
+                        AllowFiltering="true"
+                        EnableHover="true"
+                        Toolbar="ToolbarItems">
+                    <GridSortSettings>
+                        <GridSortColumns>
+                            <GridSortColumn Field="@nameof(CustomerGroup.Name)" Direction="SortDirection.Ascending"></GridSortColumn>
+                        </GridSortColumns>
+                    </GridSortSettings>
+                    <GridEditSettings AllowAdding="true"
+                                      AllowDeleting="true"
+                                      AllowEditing="true"
+                                      AllowEditOnDblClick="true"
+                                      ShowConfirmDialog="true">
+                    </GridEditSettings>
+                    <GridColumns>
+                        <GridColumn Field="@nameof(CustomerGroup.Name)" HeaderText="Group Name" Width="230"></GridColumn>
+                        <GridColumn Field="@nameof(CustomerGroup.DiscountPercent)" HeaderText="Discount Percent" TextAlign="TextAlign.Center"></GridColumn>
 
-                    .e-grid .e-headercell {
-                        background-color: #262b2f;
+                        <GridColumn HeaderText="Manage" Width="120" AllowFiltering="false" TextAlign="TextAlign.Center" IsFrozen="true">
+                            <GridCommandColumns>
+                                <GridCommandColumn Type="CommandButtonType.Edit" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-edit", CssClass = "e-flat" })"></GridCommandColumn>
+                                <GridCommandColumn Type="CommandButtonType.Delete" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-delete", CssClass = "e-flat" })"></GridCommandColumn>
+                                <GridCommandColumn Type="CommandButtonType.Save" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-update", CssClass = "e-flat" })"></GridCommandColumn>
+                                <GridCommandColumn Type="CommandButtonType.Cancel" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-cancel-icon", CssClass = "e-flat" })"></GridCommandColumn>
+                            </GridCommandColumns>
+                        </GridColumn>
+                    </GridColumns>
+                    <GridEvents TValue="CustomerGroup" OnActionBegin="ActionBeginCustomerGroup"></GridEvents>
+                </SfGrid>
+                <style>
+                    .e-grid {
+                        border-radius: 10px;
                     }
 
-                .e-gridheader {
-                    border-radius: 5px;
-                }
+                        .e-grid .e-headercell {
+                            background-color: #262b2f;
+                        }
 
-                .e-headercell {
-                    color: white;
-                }
-            </style>
+                    .e-gridheader {
+                        border-radius: 5px;
+                    }
+
+                    .e-headercell {
+                        color: white;
+                    }
+                </style>
+            </div>
         </div>
     </div>
 </div>

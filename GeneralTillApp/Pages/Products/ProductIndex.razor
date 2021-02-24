@@ -8,256 +8,261 @@
 @inject StateManager _stateManager
 @inject ApplicationDbContext _context
 
-<div class="row">
-    <h3 class="col-2">Products stuff</h3>
-    <div class="col-7"></div>
-    <button class="btn btn-primary col-1" @onclick="NavigateToAddProduct">Add product</button>
-</div>
 
-<SfToast @ref="ToastNotification" Title="@NotifOption.ToastTitle" Content="@NotifOption.ToastContent" CssClass="@NotifOption.ToastCSS">
-    <ToastPosition X="Right" Y="Top"></ToastPosition>
-</SfToast>
+<div class="PagePadding">
 
 
-<br />
+    <div class="row">
+        <h3 class="col-2">Products stuff</h3>
+        <div class="col-6"></div>
+        <button class="btn btn-primary col-1" @onclick="NavigateToAddProduct">Add product</button>
+    </div>
 
-<div class="row">
-    <SfGrid DataSource="Products"
-            TValue="Product"
-            Width="1400px"
-            AllowFiltering="true">
+    <SfToast @ref="ToastNotification" Title="@NotifOption.ToastTitle" Content="@NotifOption.ToastContent" CssClass="@NotifOption.ToastCSS">
+        <ToastPosition X="Right" Y="Top"></ToastPosition>
+    </SfToast>
 
-        <GridEditSettings AllowDeleting="true"
-                          AllowEditing="true"
-                          AllowEditOnDblClick="true"
-                          ShowDeleteConfirmDialog="true">
-        </GridEditSettings>
 
-        <GridColumns>
-            <GridColumn Field="@nameof(Product.Id)" IsPrimaryKey="true" Visible="false"></GridColumn>
-            <GridColumn Field="@nameof(Product.Title)" Width="200px"></GridColumn>
-            <GridColumn Field="@nameof(Product.Description)"></GridColumn>
-            <GridColumn Field="@nameof(Product.UPC)"></GridColumn>
-            <GridColumn Field="@nameof(Product.OnHand)" HeaderText="On Hand" Width="100" HeaderTextAlign="TextAlign.Center" TextAlign="TextAlign.Center"></GridColumn>
-            <GridColumn Field="@nameof(Product.OnOrder)" HeaderText="On Order" Width="110" HeaderTextAlign="TextAlign.Center" TextAlign="TextAlign.Center"></GridColumn>
-            <GridColumn Field="@nameof(Product.AcqCost)" HeaderText="Acq. Cost" Width="120" TextAlign="TextAlign.Center" Format="c"></GridColumn>
-            <GridColumn Field="@nameof(Product.Cost)" HeaderText="Retail Cost" Width="120" TextAlign="TextAlign.Center" Format="c"></GridColumn>
-            <GridColumn Field="ProductGroup.Name" HeaderText="Product Group" EditType="EditType.DropDownEdit">
-                <EditTemplate>
-                    <SfDropDownList TValue="ProductGroup"
-                                    TItem="ProductGroup"
-                                    DataSource="@ProductGroups"
-                                    Placeholder="Select Group"
-                                    @bind-Value="((context as Product).ProductGroup)">
-                    </SfDropDownList>
-                </EditTemplate>
-            </GridColumn>
-            <GridColumn Field="@nameof(Product.Discountable)" DisplayAsCheckBox="true" Width="100px" HeaderText="Discount" HeaderTextAlign="TextAlign.Center" TextAlign="TextAlign.Center"></GridColumn>
-            <GridColumn Field="@nameof(Product.PST)" DisplayAsCheckBox="true" Width="70px" HeaderTextAlign="TextAlign.Center" TextAlign="TextAlign.Center"></GridColumn>
-            <GridColumn Field="@nameof(Product.GST)" DisplayAsCheckBox="true" Width="70px" HeaderTextAlign="TextAlign.Center" TextAlign="TextAlign.Center"></GridColumn>
-            <GridColumn Field="@nameof(Product.ShelfMin)" HeaderText="Shelf Min" Width="120" HeaderTextAlign="TextAlign.Center" TextAlign="TextAlign.Center"></GridColumn>
-            <GridColumn Field="@nameof(Product.ShelfMax)" HeaderText="Shelf Max" Width="120" HeaderTextAlign="TextAlign.Center" TextAlign="TextAlign.Center"></GridColumn>
-            <GridColumn Field="@nameof(Product.UnitSize)" HeaderText="Unit Size" Width="100" HeaderTextAlign="TextAlign.Center" TextAlign="TextAlign.Center"></GridColumn>
-            <GridColumn Field="UnitOfMeasure.Name" Width="150" HeaderText="Unit of Measure">
-                <EditTemplate>
-                    <SfDropDownList TValue="UnitOfMeasure"
-                                    TItem="UnitOfMeasure"
-                                    DataSource="@UnitOfMeasures"
-                                    @bind-Value="(context as Product).UnitOfMeasure"
-                                    Placeholder="Select Unit Type">
-                    </SfDropDownList>
-                </EditTemplate>
-            </GridColumn>
-            <GridColumn Field="@nameof(Product.DateAdded)" HeaderText="Date Added" Format="d" Width="120px" HeaderTextAlign="TextAlign.Center" TextAlign="TextAlign.Center"></GridColumn>
-            <GridColumn Field="@nameof(Product.LastEdited)" HeaderText="Last Edited" Format="d" Width="120px" HeaderTextAlign="TextAlign.Center" TextAlign="TextAlign.Center"></GridColumn>
+    <br />
 
-            <GridColumn HeaderText="Manage" Width="120" AllowFiltering="false" IsFrozen="true" TextAlign="TextAlign.Center" HeaderTextAlign="TextAlign.Center">
-                <GridCommandColumns>
-                    <GridCommandColumn Type="CommandButtonType.Edit" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-edit", CssClass = "e-flat" })"></GridCommandColumn>
-                    <GridCommandColumn Type="CommandButtonType.Delete" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-delete", CssClass = "e-flat" })"></GridCommandColumn>
-                    <GridCommandColumn Type="CommandButtonType.Save" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-update", CssClass = "e-flat" })"></GridCommandColumn>
-                    <GridCommandColumn Type="CommandButtonType.Cancel" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-cancel-icon", CssClass = "e-flat" })"></GridCommandColumn>
-                </GridCommandColumns>
-            </GridColumn>
-        </GridColumns>
-        <GridEvents TValue="Product" OnActionBegin="ActionBeginProduct"></GridEvents>
-    </SfGrid>
-    <style>
-        .e-grid {
-            border-radius: 10px;
-        }
+    <div class="row">
+        <SfGrid DataSource="Products"
+                TValue="Product"
+                Width="1400px"
+                AllowFiltering="true">
 
-            .e-grid .e-headercell {
-                background-color: #262b2f;
+            <GridEditSettings AllowDeleting="true"
+                              AllowEditing="true"
+                              AllowEditOnDblClick="true"
+                              ShowDeleteConfirmDialog="true">
+            </GridEditSettings>
+
+            <GridColumns>
+                <GridColumn Field="@nameof(Product.Id)" IsPrimaryKey="true" Visible="false"></GridColumn>
+                <GridColumn Field="@nameof(Product.Title)" Width="200px"></GridColumn>
+                <GridColumn Field="@nameof(Product.Description)"></GridColumn>
+                <GridColumn Field="@nameof(Product.UPC)"></GridColumn>
+                <GridColumn Field="@nameof(Product.OnHand)" HeaderText="On Hand" Width="100" HeaderTextAlign="TextAlign.Center" TextAlign="TextAlign.Center"></GridColumn>
+                <GridColumn Field="@nameof(Product.OnOrder)" HeaderText="On Order" Width="110" HeaderTextAlign="TextAlign.Center" TextAlign="TextAlign.Center"></GridColumn>
+                <GridColumn Field="@nameof(Product.AcqCost)" HeaderText="Acq. Cost" Width="120" TextAlign="TextAlign.Center" Format="c"></GridColumn>
+                <GridColumn Field="@nameof(Product.Cost)" HeaderText="Retail Cost" Width="120" TextAlign="TextAlign.Center" Format="c"></GridColumn>
+                <GridColumn Field="ProductGroup.Name" HeaderText="Product Group" EditType="EditType.DropDownEdit">
+                    <EditTemplate>
+                        <SfDropDownList TValue="ProductGroup"
+                                        TItem="ProductGroup"
+                                        DataSource="@ProductGroups"
+                                        Placeholder="Select Group"
+                                        @bind-Value="((context as Product).ProductGroup)">
+                        </SfDropDownList>
+                    </EditTemplate>
+                </GridColumn>
+                <GridColumn Field="@nameof(Product.Discountable)" DisplayAsCheckBox="true" Width="100px" HeaderText="Discount" HeaderTextAlign="TextAlign.Center" TextAlign="TextAlign.Center"></GridColumn>
+                <GridColumn Field="@nameof(Product.PST)" DisplayAsCheckBox="true" Width="70px" HeaderTextAlign="TextAlign.Center" TextAlign="TextAlign.Center"></GridColumn>
+                <GridColumn Field="@nameof(Product.GST)" DisplayAsCheckBox="true" Width="70px" HeaderTextAlign="TextAlign.Center" TextAlign="TextAlign.Center"></GridColumn>
+                <GridColumn Field="@nameof(Product.ShelfMin)" HeaderText="Shelf Min" Width="120" HeaderTextAlign="TextAlign.Center" TextAlign="TextAlign.Center"></GridColumn>
+                <GridColumn Field="@nameof(Product.ShelfMax)" HeaderText="Shelf Max" Width="120" HeaderTextAlign="TextAlign.Center" TextAlign="TextAlign.Center"></GridColumn>
+                <GridColumn Field="@nameof(Product.UnitSize)" HeaderText="Unit Size" Width="100" HeaderTextAlign="TextAlign.Center" TextAlign="TextAlign.Center"></GridColumn>
+                <GridColumn Field="UnitOfMeasure.Name" Width="150" HeaderText="Unit of Measure">
+                    <EditTemplate>
+                        <SfDropDownList TValue="UnitOfMeasure"
+                                        TItem="UnitOfMeasure"
+                                        DataSource="@UnitOfMeasures"
+                                        @bind-Value="(context as Product).UnitOfMeasure"
+                                        Placeholder="Select Unit Type">
+                        </SfDropDownList>
+                    </EditTemplate>
+                </GridColumn>
+                <GridColumn Field="@nameof(Product.DateAdded)" HeaderText="Date Added" Format="d" Width="120px" HeaderTextAlign="TextAlign.Center" TextAlign="TextAlign.Center"></GridColumn>
+                <GridColumn Field="@nameof(Product.LastEdited)" HeaderText="Last Edited" Format="d" Width="120px" HeaderTextAlign="TextAlign.Center" TextAlign="TextAlign.Center"></GridColumn>
+
+                <GridColumn HeaderText="Manage" Width="120" AllowFiltering="false" IsFrozen="true" TextAlign="TextAlign.Center" HeaderTextAlign="TextAlign.Center">
+                    <GridCommandColumns>
+                        <GridCommandColumn Type="CommandButtonType.Edit" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-edit", CssClass = "e-flat" })"></GridCommandColumn>
+                        <GridCommandColumn Type="CommandButtonType.Delete" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-delete", CssClass = "e-flat" })"></GridCommandColumn>
+                        <GridCommandColumn Type="CommandButtonType.Save" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-update", CssClass = "e-flat" })"></GridCommandColumn>
+                        <GridCommandColumn Type="CommandButtonType.Cancel" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-cancel-icon", CssClass = "e-flat" })"></GridCommandColumn>
+                    </GridCommandColumns>
+                </GridColumn>
+            </GridColumns>
+            <GridEvents TValue="Product" OnActionBegin="ActionBeginProduct"></GridEvents>
+        </SfGrid>
+        <style>
+            .e-grid {
+                border-radius: 10px;
             }
 
-        .e-gridheader {
-            border-radius: 5px;
-        }
-
-        .e-headercell {
-            color: white;
-        }
-    </style>
-</div>
-
-<style>
-    .e-gridheader{
-        background-color:blue;
-    }
-
-</style>
-
-@code {
-
-    #region Properties
-    private ObservableCollection<Product> Products { get; set; }
-    private ObservableCollection<ProductGroup> ProductGroups { get; set; }
-    private ObservableCollection<UnitOfMeasure> UnitOfMeasures { get; set; }
-
-    public UnitOfMeasure DropDownSelectUnitOfMeasure { get; set; }
-    public ProductGroup DropDownSelectProductGroup { get; set; }
-
-    public ProductGroup PreviouslyEditedGroup { get; set; }
-    public UnitOfMeasure PreviouslyEditedUnitOfMeasure { get; set; }
-
-    public NotificationOption NotifOption { get; set; }
-    public SfToast ToastNotification { get; set; }
-
-    public SfGrid<Product> Grid { get; set; }
-
-
-
-    #endregion
-
-    #region Methods
-
-    private void NavigateToAddProduct()
-    {
-        _navManager.NavigateTo("/product/addproduct");
-    }
-
-    protected override async Task OnInitializedAsync()
-    {
-        NotifOption = new NotificationOption();
-        Products = new ObservableCollection<Product>(_context.Products.Include(p => p.ProductGroup).Include(p => p.UnitOfMeasure).ToList());
-        UnitOfMeasures = new ObservableCollection<UnitOfMeasure>(_context.UnitOfMeasures.ToList());
-        ProductGroups = new ObservableCollection<ProductGroup>(_context.ProductGroups.ToList());
-
-
-        // Generate Required Toast
-        if (_stateManager.NotificationManager.Status == NotificationManager.NotificationStatus.Success ||
-            _stateManager.NotificationManager.Status == NotificationManager.NotificationStatus.Failed)
-        {
-            NotifOption = _stateManager.NotificationManager.GenerateToastOption();
-            await ShowToast();
-            _stateManager.NotificationManager.RemoveNotification();
-            NotifOption = new NotificationOption();
-        }
-    }
-
-    private async Task ShowToast()
-    {
-        await Task.Delay(100);
-        await ToastNotification.Show();
-    }
-
-    // Only used for testing Toastr Notifications 
-    public async Task TestToast()
-    {
-        var testProduct = new Product { Title="Test Product" };
-        _stateManager.NotificationManager.AddNotification<Product>(testProduct, NotificationManager.NotificationStatus.Success);
-        NotifOption = _stateManager.NotificationManager.GenerateToastOption();
-        await ShowToast();
-    }
-
-    // Grid Save and Delete Db Context extensions
-    private void ActionBeginProduct(ActionEventArgs<Product> arg)
-    {
-        // General Edit Action
-        if (arg.RequestType.Equals(Syncfusion.Blazor.Grids.Action.BeginEdit))
-        {
-            if (arg.Data.UnitOfMeasure != null)
-                DropDownSelectUnitOfMeasure = arg.Data.UnitOfMeasure;
-
-            if (arg.Data.ProductGroup != null)
-                DropDownSelectProductGroup = arg.Data.ProductGroup;
-        }
-
-        // General save action
-        if (arg.RequestType.Equals(Syncfusion.Blazor.Grids.Action.Save))
-        {
-            if (arg.Data.Id != 0)
-            {
-                var product = _context.Products.Include(p => p.ProductGroup).Include(p => p.UnitOfMeasure).FirstOrDefault(p => p.Id == arg.Data.Id);
-                if (product != null)
-                {
-                    product.Title = arg.Data.Title;
-                    product.Description = arg.Data.Description;
-                    product.UPC = arg.Data.UPC;
-                    product.OnHand = arg.Data.OnHand;
-                    product.OnOrder = arg.Data.OnOrder;
-                    product.AcqCost = arg.Data.AcqCost;
-                    product.Cost = arg.Data.Cost;
-                    product.Discountable = arg.Data.Discountable;
-                    product.PST = arg.Data.PST;
-                    product.GST = arg.Data.GST;
-                    product.ShelfMax = arg.Data.ShelfMax;
-                    product.ShelfMin = arg.Data.ShelfMin;
-                    product.UnitSize = arg.Data.UnitSize;
-                    product.LastEdited = DateTime.Now;
-
-                    if(arg.Data.ProductGroup != product.ProductGroup && arg.Data.ProductGroup != null)
-                    {
-                        product.ProductGroup = arg.Data.ProductGroup;
-                        product.ProductGroupId = product.ProductGroup.Id;
-                    }
-
-                    if(arg.Data.UnitOfMeasure != product.UnitOfMeasure && arg.Data.UnitOfMeasure != null)
-                    {
-                        product.UnitOfMeasure = arg.Data.UnitOfMeasure;
-                        product.UnitOfMeasureId = product.UnitOfMeasure.Id;
-                    }
-
-                    // Quick fix for the issue of the group being null 
-                    if(product.ProductGroup == null)
-                    {
-                        product.ProductGroup = PreviouslyEditedGroup;
-                        product.ProductGroupId = product.ProductGroup.Id;
-                    }
-
-                    // Quick fix for unit of measure 
-                    if(product.UnitOfMeasure == null)
-                    {
-                        product.UnitOfMeasure = PreviouslyEditedUnitOfMeasure;
-                        product.UnitOfMeasureId = product.UnitOfMeasure.Id;
-                    }
-
-                    if(product.ProductGroup != null || product.UnitOfMeasure != null)
-                    {
-                        PreviouslyEditedUnitOfMeasure = product.UnitOfMeasure;
-                        PreviouslyEditedGroup = product.ProductGroup;
-
-                        // Update the product and Save the changes
-                        _context.Products.Update(product);
-                        _context.SaveChanges();
-                    }
+                .e-grid .e-headercell {
+                    background-color: #262b2f;
                 }
 
-                else
-                    Console.WriteLine("There was an error saving the product");
+            .e-gridheader {
+                border-radius: 5px;
             }
-            else
-                Console.WriteLine("The id was set to 0");
-        }
 
-        // Delete Action
-        if (arg.RequestType.Equals(Syncfusion.Blazor.Grids.Action.Delete))
+            .e-headercell {
+                color: white;
+            }
+        </style>
+    </div>
+
+    <style>
+        .e-gridheader {
+            background-color: blue;
+        }
+    </style>
+
+</div>
+
+    @code {
+
+        #region Properties
+        private ObservableCollection<Product> Products { get; set; }
+        private ObservableCollection<ProductGroup> ProductGroups { get; set; }
+        private ObservableCollection<UnitOfMeasure> UnitOfMeasures { get; set; }
+
+        public UnitOfMeasure DropDownSelectUnitOfMeasure { get; set; }
+        public ProductGroup DropDownSelectProductGroup { get; set; }
+
+        public ProductGroup PreviouslyEditedGroup { get; set; }
+        public UnitOfMeasure PreviouslyEditedUnitOfMeasure { get; set; }
+
+        public NotificationOption NotifOption { get; set; }
+        public SfToast ToastNotification { get; set; }
+
+        public SfGrid<Product> Grid { get; set; }
+
+
+
+        #endregion
+
+        #region Methods
+
+        private void NavigateToAddProduct()
         {
-            _context.Products.Remove(arg.Data);
-            _context.SaveChanges();
+            _navManager.NavigateTo("/product/add");
         }
-    }
 
-    #endregion
-}
+        protected override async Task OnInitializedAsync()
+        {
+            NotifOption = new NotificationOption();
+            Products = new ObservableCollection<Product>(_context.Products.Include(p => p.ProductGroup).Include(p => p.UnitOfMeasure).ToList());
+            UnitOfMeasures = new ObservableCollection<UnitOfMeasure>(_context.UnitOfMeasures.ToList());
+            ProductGroups = new ObservableCollection<ProductGroup>(_context.ProductGroups.ToList());
+
+
+            // Generate Required Toast
+            if (_stateManager.NotificationManager.Status == NotificationManager.NotificationStatus.Success ||
+                _stateManager.NotificationManager.Status == NotificationManager.NotificationStatus.Failed)
+            {
+                NotifOption = _stateManager.NotificationManager.GenerateToastOption();
+                await ShowToast();
+                _stateManager.NotificationManager.RemoveNotification();
+                NotifOption = new NotificationOption();
+            }
+        }
+
+        private async Task ShowToast()
+        {
+            await Task.Delay(100);
+            await ToastNotification.Show();
+        }
+
+        // Only used for testing Toastr Notifications
+        public async Task TestToast()
+        {
+            var testProduct = new Product { Title = "Test Product" };
+            _stateManager.NotificationManager.AddNotification<Product>(testProduct, NotificationManager.NotificationStatus.Success);
+            NotifOption = _stateManager.NotificationManager.GenerateToastOption();
+            await ShowToast();
+        }
+
+        // Grid Save and Delete Db Context extensions
+        private void ActionBeginProduct(ActionEventArgs<Product> arg)
+        {
+            // General Edit Action
+            if (arg.RequestType.Equals(Syncfusion.Blazor.Grids.Action.BeginEdit))
+            {
+                if (arg.Data.UnitOfMeasure != null)
+                    DropDownSelectUnitOfMeasure = arg.Data.UnitOfMeasure;
+
+                if (arg.Data.ProductGroup != null)
+                    DropDownSelectProductGroup = arg.Data.ProductGroup;
+            }
+
+            // General save action
+            if (arg.RequestType.Equals(Syncfusion.Blazor.Grids.Action.Save))
+            {
+                if (arg.Data.Id != 0)
+                {
+                    var product = _context.Products.Include(p => p.ProductGroup).Include(p => p.UnitOfMeasure).FirstOrDefault(p => p.Id == arg.Data.Id);
+                    if (product != null)
+                    {
+                        product.Title = arg.Data.Title;
+                        product.Description = arg.Data.Description;
+                        product.UPC = arg.Data.UPC;
+                        product.OnHand = arg.Data.OnHand;
+                        product.OnOrder = arg.Data.OnOrder;
+                        product.AcqCost = arg.Data.AcqCost;
+                        product.Cost = arg.Data.Cost;
+                        product.Discountable = arg.Data.Discountable;
+                        product.PST = arg.Data.PST;
+                        product.GST = arg.Data.GST;
+                        product.ShelfMax = arg.Data.ShelfMax;
+                        product.ShelfMin = arg.Data.ShelfMin;
+                        product.UnitSize = arg.Data.UnitSize;
+                        product.LastEdited = DateTime.Now;
+
+                        if (arg.Data.ProductGroup != product.ProductGroup && arg.Data.ProductGroup != null)
+                        {
+                            product.ProductGroup = arg.Data.ProductGroup;
+                            product.ProductGroupId = product.ProductGroup.Id;
+                        }
+
+                        if (arg.Data.UnitOfMeasure != product.UnitOfMeasure && arg.Data.UnitOfMeasure != null)
+                        {
+                            product.UnitOfMeasure = arg.Data.UnitOfMeasure;
+                            product.UnitOfMeasureId = product.UnitOfMeasure.Id;
+                        }
+
+                        // Quick fix for the issue of the group being null
+                        if (product.ProductGroup == null)
+                        {
+                            product.ProductGroup = PreviouslyEditedGroup;
+                            product.ProductGroupId = product.ProductGroup.Id;
+                        }
+
+                        // Quick fix for unit of measure
+                        if (product.UnitOfMeasure == null)
+                        {
+                            product.UnitOfMeasure = PreviouslyEditedUnitOfMeasure;
+                            product.UnitOfMeasureId = product.UnitOfMeasure.Id;
+                        }
+
+                        if (product.ProductGroup != null || product.UnitOfMeasure != null)
+                        {
+                            PreviouslyEditedUnitOfMeasure = product.UnitOfMeasure;
+                            PreviouslyEditedGroup = product.ProductGroup;
+
+                            // Update the product and Save the changes
+                            _context.Products.Update(product);
+                            _context.SaveChanges();
+                        }
+                    }
+
+                    else
+                        Console.WriteLine("There was an error saving the product");
+                }
+                else
+                    Console.WriteLine("The id was set to 0");
+            }
+
+            // Delete Action
+            if (arg.RequestType.Equals(Syncfusion.Blazor.Grids.Action.Delete))
+            {
+                _context.Products.Remove(arg.Data);
+                _context.SaveChanges();
+            }
+        }
+
+        #endregion
+    }

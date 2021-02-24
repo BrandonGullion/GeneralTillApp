@@ -3,18 +3,18 @@
 
 <div class="main" style="z-index:5; padding:0px">
     <!-- Top Menu Bar -->
-    <nav>
+    <nav style="width:100%">
         <div class="custom-dropdown">
             <div class="GeneralTillLogo">
                 <label>General Till</label>
             </div>
 
             <div class="custom-dropdown-item custom-dropdown-item-hover">
-                <a class="custom-dropdown-item-hover" style="margin-top:0" href="/">Home</a>
+                <a class="custom-dropdown-item-hover" style="margin-top:5" href="/">Home</a>
             </div>
 
             <div class="custom-dropdown-item">
-                <a class="custom-dropdown-item-hover" style="margin-top:0px" href="/cashregister">Cash Register</a>
+                <a class="custom-dropdown-item-hover" style="margin-top:8px" href="/cashregister">Cash Register</a>
             </div>
 
             <div class="custom-dropdown-item">
@@ -35,14 +35,33 @@
                 </ul>
             </div>
 
-            <div style="width:35%"></div>
+            <div class="custom-dropdown-item">
+                <button>Recieving</button>
+                <ul>
+                    <li><a href="/recieving/all">View All</a></li>
+                    <li><a href="/recieving/new">Create new recieving</a></li>
+                </ul>
+            </div>
+
+            <div class="custom-dropdown-item">
+                <button>Reports</button>
+                <ul>
+                    <li><a href="/reports/all">All Reports</a></li>
+                    <li><a href="/reports/customer">Customer Reports</a></li>
+                    <li><a href="/reports/product">Product Reports</a></li>
+                    <li><a href="/reports/sales">Sales Reports</a></li>
+                    <li><a href="/reports/recieving">Recieving Reports</a></li>
+                </ul>
+            </div>
+
+            <div style="width:25%"></div>
 
             <div class="loginDisplay">
                 <LoginDisplay></LoginDisplay>
             </div>
         </div>
     </nav>
-    <div class="content px-4">
+    <div class="content" style="padding:0px; height:100%;">
         @Body
     </div>
 </div>

@@ -1,170 +1,172 @@
 ﻿@page "/customer"
 @inject ApplicationDbContext _context
 @inject StateManager _stateManager
+    <div class="PagePadding">
 
-<h3>Customers</h3>
+        <h3>Customers</h3>
 
-<SfToast @ref="ToastNotification" Title="@NotifOption.ToastTitle" Content="@NotifOption.ToastContent" CssClass="@NotifOption.ToastCSS">
-    <ToastPosition X="Right" Y="Top"></ToastPosition>
-</SfToast>
+        <SfToast @ref="ToastNotification" Title="@NotifOption.ToastTitle" Content="@NotifOption.ToastContent" CssClass="@NotifOption.ToastCSS">
+            <ToastPosition X="Right" Y="Top"></ToastPosition>
+        </SfToast>
 
-<div class="row">
+        <div class="row">
 
-    <SfGrid DataSource="Customers"
-            TValue="Customer"
-            Width="1400px"
-            AllowFiltering="true"
-            @ref="SFGrid">
-        <GridEditSettings AllowDeleting="true"
-                          AllowEditing="true"
-                          AllowEditOnDblClick="true">
-        </GridEditSettings>
+            <SfGrid DataSource="Customers"
+                    TValue="Customer"
+                    Width="1400px"
+                    AllowFiltering="true"
+                    @ref="SFGrid">
+                <GridEditSettings AllowDeleting="true"
+                                  AllowEditing="true"
+                                  AllowEditOnDblClick="true">
+                </GridEditSettings>
 
-        <GridColumns>
-            <GridColumn Field="@nameof(Customer.Id)" IsPrimaryKey="true" Visible="false"></GridColumn>
-            <GridColumn Field="@nameof(Customer.CustomerCode)"></GridColumn>
-            <GridColumn Field="@nameof(Customer.FirstName)"></GridColumn>
-            <GridColumn Field="@nameof(Customer.LastName)"></GridColumn>
-            <GridColumn Field="CustomerGroup.Name" HeaderText="Product Group">
-                <EditTemplate>
-                    <SfDropDownList @bind-Value="@((context as Customer).CustomerGroup)" TValue="CustomerGroup" TItem="CustomerGroup" DataSource="@CustomerGroups" Placeholder="Select Group">
-                        <DropDownListFieldSettings Text="Name"></DropDownListFieldSettings>
-                    </SfDropDownList>
-                </EditTemplate>
-            </GridColumn>
+                <GridColumns>
+                    <GridColumn Field="@nameof(Customer.Id)" IsPrimaryKey="true" Visible="false"></GridColumn>
+                    <GridColumn Field="@nameof(Customer.CustomerCode)"></GridColumn>
+                    <GridColumn Field="@nameof(Customer.FirstName)"></GridColumn>
+                    <GridColumn Field="@nameof(Customer.LastName)"></GridColumn>
+                    <GridColumn Field="CustomerGroup.Name" HeaderText="Product Group">
+                        <EditTemplate>
+                            <SfDropDownList @bind-Value="@((context as Customer).CustomerGroup)" TValue="CustomerGroup" TItem="CustomerGroup" DataSource="@CustomerGroups" Placeholder="Select Group">
+                                <DropDownListFieldSettings Text="Name"></DropDownListFieldSettings>
+                            </SfDropDownList>
+                        </EditTemplate>
+                    </GridColumn>
 
-            <GridColumn Field="@nameof(Customer.StreetAddress)"></GridColumn>
-            <GridColumn Field="@nameof(Customer.City)"></GridColumn>
-            <GridColumn Field="@nameof(Customer.Province_State)"></GridColumn>
-            <GridColumn Field="@nameof(Customer.Country)"></GridColumn>
-            <GridColumn Field="@nameof(Customer.PostalCode)"></GridColumn>
-            <GridColumn Field="@nameof(Customer.TelephoneNumber)"></GridColumn>
-            <GridColumn Field="@nameof(Customer.Email)"></GridColumn>
-            <GridColumn Field="@nameof(Customer.ARBalance)" TextAlign="TextAlign.Center"></GridColumn>
-            <GridColumn Field="@nameof(Customer.ARLimit)" TextAlign="TextAlign.Center"></GridColumn>
-            <GridColumn Field="@nameof(Customer.DateCreated)" Format="d" TextAlign="TextAlign.Center"></GridColumn>
-            <GridColumn Field="@nameof(Customer.LastEdited)" Format="d" TextAlign="TextAlign.Center"></GridColumn>
-            <GridColumn Field="@nameof(Customer.DiscountPercent)" TextAlign="TextAlign.Center"></GridColumn>
-            <GridColumn Field="@nameof(Customer.Note)"></GridColumn>
+                    <GridColumn Field="@nameof(Customer.StreetAddress)"></GridColumn>
+                    <GridColumn Field="@nameof(Customer.City)"></GridColumn>
+                    <GridColumn Field="@nameof(Customer.Province_State)"></GridColumn>
+                    <GridColumn Field="@nameof(Customer.Country)"></GridColumn>
+                    <GridColumn Field="@nameof(Customer.PostalCode)"></GridColumn>
+                    <GridColumn Field="@nameof(Customer.TelephoneNumber)"></GridColumn>
+                    <GridColumn Field="@nameof(Customer.Email)"></GridColumn>
+                    <GridColumn Field="@nameof(Customer.ARBalance)" TextAlign="TextAlign.Center"></GridColumn>
+                    <GridColumn Field="@nameof(Customer.ARLimit)" TextAlign="TextAlign.Center"></GridColumn>
+                    <GridColumn Field="@nameof(Customer.DateCreated)" Format="d" TextAlign="TextAlign.Center"></GridColumn>
+                    <GridColumn Field="@nameof(Customer.LastEdited)" Format="d" TextAlign="TextAlign.Center"></GridColumn>
+                    <GridColumn Field="@nameof(Customer.DiscountPercent)" TextAlign="TextAlign.Center"></GridColumn>
+                    <GridColumn Field="@nameof(Customer.Note)"></GridColumn>
 
-            <GridColumn HeaderText="Manage" Width="120" AllowFiltering="false" IsFrozen="true" TextAlign="TextAlign.Center" HeaderTextAlign="TextAlign.Center">
-                <GridCommandColumns>
-                    <GridCommandColumn Type="CommandButtonType.Edit" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-edit", CssClass = "e-flat" })"></GridCommandColumn>
-                    <GridCommandColumn Type="CommandButtonType.Delete" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-delete", CssClass = "e-flat" })"></GridCommandColumn>
-                    <GridCommandColumn Type="CommandButtonType.Save" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-update", CssClass = "e-flat" })"></GridCommandColumn>
-                    <GridCommandColumn Type="CommandButtonType.Cancel" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-cancel-icon", CssClass = "e-flat" })"></GridCommandColumn>
-                </GridCommandColumns>
-            </GridColumn>
-        </GridColumns>
-        <GridEvents TValue="Customer" OnActionBegin="ActionBeginCustomer"></GridEvents>
-    </SfGrid>
+                    <GridColumn HeaderText="Manage" Width="120" AllowFiltering="false" IsFrozen="true" TextAlign="TextAlign.Center" HeaderTextAlign="TextAlign.Center">
+                        <GridCommandColumns>
+                            <GridCommandColumn Type="CommandButtonType.Edit" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-edit", CssClass = "e-flat" })"></GridCommandColumn>
+                            <GridCommandColumn Type="CommandButtonType.Delete" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-delete", CssClass = "e-flat" })"></GridCommandColumn>
+                            <GridCommandColumn Type="CommandButtonType.Save" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-update", CssClass = "e-flat" })"></GridCommandColumn>
+                            <GridCommandColumn Type="CommandButtonType.Cancel" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-cancel-icon", CssClass = "e-flat" })"></GridCommandColumn>
+                        </GridCommandColumns>
+                    </GridColumn>
+                </GridColumns>
+                <GridEvents TValue="Customer" OnActionBegin="ActionBeginCustomer"></GridEvents>
+            </SfGrid>
 
-    <style>
-        .e-grid{
-            border-radius:10px;
-        }
+            <style>
+                .e-grid {
+                    border-radius: 10px;
+                }
 
-        .e-grid .e-headercell {
-            background-color: #262b2f;
-        }
+                    .e-grid .e-headercell {
+                        background-color: #262b2f;
+                    }
 
-        .e-gridheader{
-            border-radius:5px;
-        }
+                .e-gridheader {
+                    border-radius: 5px;
+                }
 
-        .e-headercell{
-            color:white;
-        }
-    </style>
+                .e-headercell {
+                    color: white;
+                }
+            </style>
 
-</div>
+        </div>
+    </div>
 
 
-@code {
+    @code {
 
-    public List<Customer> Customers { get; set; }
-    public List<CustomerGroup> CustomerGroups { get; set; }
+        public List<Customer> Customers { get; set; }
+        public List<CustomerGroup> CustomerGroups { get; set; }
 
-    public NotificationOption NotifOption { get; set; }
-    public SfToast ToastNotification { get; set; }
+        public NotificationOption NotifOption { get; set; }
+        public SfToast ToastNotification { get; set; }
 
-    public CustomerGroup PreviouslyEditedCustomerGroup { get; set; }
-    public SfGrid<Customer> SFGrid { get; set; }
+        public CustomerGroup PreviouslyEditedCustomerGroup { get; set; }
+        public SfGrid<Customer> SFGrid { get; set; }
 
-    protected override async Task OnInitializedAsync()
-    {
-        // Need to have this first
-        NotifOption = new NotificationOption();
-
-        if(_stateManager.NotificationManager.Status == NotificationManager.NotificationStatus.Success ||
-            _stateManager.NotificationManager.Status == NotificationManager.NotificationStatus.Failed)
+        protected override async Task OnInitializedAsync()
         {
-            NotifOption = _stateManager.NotificationManager.GenerateToastOption();
-            await ShowToast();
-            _stateManager.NotificationManager.RemoveNotification();
+            // Need to have this first
             NotifOption = new NotificationOption();
+
+            if (_stateManager.NotificationManager.Status == NotificationManager.NotificationStatus.Success ||
+                _stateManager.NotificationManager.Status == NotificationManager.NotificationStatus.Failed)
+            {
+                NotifOption = _stateManager.NotificationManager.GenerateToastOption();
+                await ShowToast();
+                _stateManager.NotificationManager.RemoveNotification();
+                NotifOption = new NotificationOption();
+            }
+
+            Customers = await _context.Customers.ToListAsync();
+            CustomerGroups = await _context.CustomerGroups.ToListAsync();
         }
 
-        Customers = await _context.Customers.ToListAsync();
-        CustomerGroups = await _context.CustomerGroups.ToListAsync();
-    }
-
-    private async Task ShowToast()
-    {
-        await Task.Delay(100);
-        await ToastNotification.Show();
-    }
-
-    public void ActionBeginCustomer(ActionEventArgs<Customer> arg)
-    {
-        if (arg.RequestType.Equals(Syncfusion.Blazor.Grids.Action.Save))
+        private async Task ShowToast()
         {
-            if(arg.Data.Id != 0)
+            await Task.Delay(100);
+            await ToastNotification.Show();
+        }
+
+        public void ActionBeginCustomer(ActionEventArgs<Customer> arg)
+        {
+            if (arg.RequestType.Equals(Syncfusion.Blazor.Grids.Action.Save))
             {
-                var customer = _context.Customers.FirstOrDefault(c => c.Id == arg.Data.Id);
-
-                customer.FirstName = arg.Data.FirstName;
-                customer.LastName = arg.Data.LastName;
-                customer.StreetAddress = arg.Data.StreetAddress;
-                customer.City = arg.Data.City;
-                customer.Province_State = arg.Data.Province_State;
-                customer.Country = arg.Data.Country;
-                customer.PostalCode = arg.Data.PostalCode;
-                customer.TelephoneNumber = arg.Data.TelephoneNumber;
-                customer.Note = arg.Data.Note;
-                customer.Email = arg.Data.Email;
-                customer.ARBalance = arg.Data.ARBalance;
-                customer.ARLimit = arg.Data.ARLimit;
-                customer.LastEdited = DateTime.Now;
-                customer.DiscountPercent = arg.Data.DiscountPercent;
-                customer.CustomerCode = arg.Data.CustomerCode;
-
-                // Quick fix for the issue of the group being null 
-                if (customer.CustomerGroup == null)
+                if (arg.Data.Id != 0)
                 {
-                    customer.CustomerGroup = PreviouslyEditedCustomerGroup;
-                    customer.CustomerGroupId = customer.CustomerGroup.Id;
+                    var customer = _context.Customers.FirstOrDefault(c => c.Id == arg.Data.Id);
+
+                    customer.FirstName = arg.Data.FirstName;
+                    customer.LastName = arg.Data.LastName;
+                    customer.StreetAddress = arg.Data.StreetAddress;
+                    customer.City = arg.Data.City;
+                    customer.Province_State = arg.Data.Province_State;
+                    customer.Country = arg.Data.Country;
+                    customer.PostalCode = arg.Data.PostalCode;
+                    customer.TelephoneNumber = arg.Data.TelephoneNumber;
+                    customer.Note = arg.Data.Note;
+                    customer.Email = arg.Data.Email;
+                    customer.ARBalance = arg.Data.ARBalance;
+                    customer.ARLimit = arg.Data.ARLimit;
+                    customer.LastEdited = DateTime.Now;
+                    customer.DiscountPercent = arg.Data.DiscountPercent;
+                    customer.CustomerCode = arg.Data.CustomerCode;
+
+                    // Quick fix for the issue of the group being null
+                    if (customer.CustomerGroup == null)
+                    {
+                        customer.CustomerGroup = PreviouslyEditedCustomerGroup;
+                        customer.CustomerGroupId = customer.CustomerGroup.Id;
+                    }
+
+                    if (customer.CustomerGroup != null)
+                    {
+                        PreviouslyEditedCustomerGroup = customer.CustomerGroup;
+
+                        _context.Customers.Update(customer);
+                        _context.SaveChanges();
+                    }
                 }
-
-                if (customer.CustomerGroup != null)
+                else
                 {
-                    PreviouslyEditedCustomerGroup = customer.CustomerGroup;
-
-                    _context.Customers.Update(customer);
-                    _context.SaveChanges();
+                    // There must be an error saving because adding is not allowed
                 }
             }
-            else
+
+            if (arg.RequestType.Equals(Syncfusion.Blazor.Grids.Action.Delete))
             {
-                // There must be an error saving because adding is not allowed 
+                _context.Customers.Remove(arg.Data);
+                _context.SaveChanges();
             }
         }
 
-        if (arg.RequestType.Equals(Syncfusion.Blazor.Grids.Action.Delete))
-        {
-            _context.Customers.Remove(arg.Data);
-            _context.SaveChanges();
-        }
     }
-
-}

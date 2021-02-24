@@ -2,131 +2,135 @@
 
 @inject ApplicationDbContext _context
 
-<h3>Product Settings</h3>
+<div class="PagePadding">
 
-<!-- Top card -->
-<div class="card" style="background-color:azure; padding:1em">
-    <div class="row">
-        <!-- Product Group Grid -->
-        <div class="col-12">
-            <label class="card-title">Product Groups</label>
-            <SfGrid DataSource="@ProductGroups"
-                    AllowSorting="true"
-                    AllowFiltering="true"
-                    EnableHover="true"
-                    ID="ProductGroup"
-                    Toolbar="ToolbarItems">
-                <!-- Allows for sorting by name to begin -->
-                <GridSortSettings>
-                    <GridSortColumns>
-                        <GridSortColumn Field="@nameof(ProductGroup.Name)" Direction="SortDirection.Ascending"></GridSortColumn>
-                    </GridSortColumns>
-                </GridSortSettings>
-                <GridEditSettings AllowAdding="true"
-                                  AllowEditing="true"
-                                  AllowDeleting="true"
-                                  AllowEditOnDblClick="true" ShowDeleteConfirmDialog="true">
-                </GridEditSettings>
-                <GridColumns>
-                    <GridColumn Field="@nameof(ProductGroup.Id)" IsPrimaryKey="true" Visible="false"></GridColumn>
-                    <GridColumn Field="@nameof(ProductGroup.Name)" HeaderText="Product Name" Width="300"></GridColumn>
-                    <GridColumn Field="@nameof(ProductGroup.ProductsInGroup)" HeaderText="# Prod. in Group" Width="110" TextAlign="TextAlign.Center"></GridColumn>
-                    <GridColumn Field="@nameof(ProductGroup.Promotion)" HeaderText="Promotion" Width="100" TextAlign="TextAlign.Center"></GridColumn>
-                    <GridColumn Field="@nameof(ProductGroup.PromotionPercent)" HeaderText="% Discount" Width="100" TextAlign="TextAlign.Center"></GridColumn>
-                    <GridColumn Field="@nameof(ProductGroup.PromotionAmount)" Format="C2" HeaderText="$ Discount" Width="100" TextAlign="TextAlign.Center"></GridColumn>
-                    <GridColumn Field="@nameof(ProductGroup.PromoStartDate)" Format="d" HeaderText="Promo Start" Width="100" TextAlign="TextAlign.Center"></GridColumn>
-                    <GridColumn Field="@nameof(ProductGroup.PromoEndDate)" Format="d" HeaderText="Promo End" Width="100" TextAlign="TextAlign.Center"></GridColumn>
 
-                    <GridColumn HeaderText="Manage" Width="80" AllowFiltering="false" TextAlign="TextAlign.Center">
-                        <GridCommandColumns>
-                            <GridCommandColumn Type="CommandButtonType.Edit" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-edit", CssClass = "e-flat" })"></GridCommandColumn>
-                            <GridCommandColumn Type="CommandButtonType.Delete" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-delete", CssClass = "e-flat" })"></GridCommandColumn>
-                            <GridCommandColumn Type="CommandButtonType.Save" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-update", CssClass = "e-flat" })"></GridCommandColumn>
-                            <GridCommandColumn Type="CommandButtonType.Cancel" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-cancel-icon", CssClass = "e-flat" })"></GridCommandColumn>
-                        </GridCommandColumns>
-                    </GridColumn>
-                </GridColumns>
-                <GridEvents TValue="ProductGroup" OnActionBegin="ActionBeginProductGroup"></GridEvents>
-            </SfGrid>
-            <style>
-                .e-grid {
-                    border-radius: 10px;
-                }
+    <h3>Product Settings</h3>
 
-                    .e-grid .e-headercell {
-                        background-color: #262b2f;
+    <!-- Top card -->
+    <div class="card" style="background-color:azure; padding:1em">
+        <div class="row">
+            <!-- Product Group Grid -->
+            <div class="col-12">
+                <label class="card-title">Product Groups</label>
+                <SfGrid DataSource="@ProductGroups"
+                        AllowSorting="true"
+                        AllowFiltering="true"
+                        EnableHover="true"
+                        ID="ProductGroup"
+                        Toolbar="ToolbarItems">
+                    <!-- Allows for sorting by name to begin -->
+                    <GridSortSettings>
+                        <GridSortColumns>
+                            <GridSortColumn Field="@nameof(ProductGroup.Name)" Direction="SortDirection.Ascending"></GridSortColumn>
+                        </GridSortColumns>
+                    </GridSortSettings>
+                    <GridEditSettings AllowAdding="true"
+                                      AllowEditing="true"
+                                      AllowDeleting="true"
+                                      AllowEditOnDblClick="true" ShowDeleteConfirmDialog="true">
+                    </GridEditSettings>
+                    <GridColumns>
+                        <GridColumn Field="@nameof(ProductGroup.Id)" IsPrimaryKey="true" Visible="false"></GridColumn>
+                        <GridColumn Field="@nameof(ProductGroup.Name)" HeaderText="Product Name" Width="300"></GridColumn>
+                        <GridColumn Field="@nameof(ProductGroup.ProductsInGroup)" HeaderText="# Prod. in Group" Width="110" TextAlign="TextAlign.Center"></GridColumn>
+                        <GridColumn Field="@nameof(ProductGroup.Promotion)" HeaderText="Promotion" Width="100" TextAlign="TextAlign.Center"></GridColumn>
+                        <GridColumn Field="@nameof(ProductGroup.PromotionPercent)" HeaderText="% Discount" Width="100" TextAlign="TextAlign.Center"></GridColumn>
+                        <GridColumn Field="@nameof(ProductGroup.PromotionAmount)" Format="C2" HeaderText="$ Discount" Width="100" TextAlign="TextAlign.Center"></GridColumn>
+                        <GridColumn Field="@nameof(ProductGroup.PromoStartDate)" Format="d" HeaderText="Promo Start" Width="100" TextAlign="TextAlign.Center"></GridColumn>
+                        <GridColumn Field="@nameof(ProductGroup.PromoEndDate)" Format="d" HeaderText="Promo End" Width="100" TextAlign="TextAlign.Center"></GridColumn>
+
+                        <GridColumn HeaderText="Manage" Width="80" AllowFiltering="false" TextAlign="TextAlign.Center">
+                            <GridCommandColumns>
+                                <GridCommandColumn Type="CommandButtonType.Edit" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-edit", CssClass = "e-flat" })"></GridCommandColumn>
+                                <GridCommandColumn Type="CommandButtonType.Delete" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-delete", CssClass = "e-flat" })"></GridCommandColumn>
+                                <GridCommandColumn Type="CommandButtonType.Save" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-update", CssClass = "e-flat" })"></GridCommandColumn>
+                                <GridCommandColumn Type="CommandButtonType.Cancel" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-cancel-icon", CssClass = "e-flat" })"></GridCommandColumn>
+                            </GridCommandColumns>
+                        </GridColumn>
+                    </GridColumns>
+                    <GridEvents TValue="ProductGroup" OnActionBegin="ActionBeginProductGroup"></GridEvents>
+                </SfGrid>
+                <style>
+                    .e-grid {
+                        border-radius: 10px;
                     }
 
-                .e-gridheader {
-                    border-radius: 5px;
-                }
+                        .e-grid .e-headercell {
+                            background-color: #262b2f;
+                        }
 
-                .e-headercell {
-                    color: white;
-                }
-            </style>
+                    .e-gridheader {
+                        border-radius: 5px;
+                    }
+
+                    .e-headercell {
+                        color: white;
+                    }
+                </style>
+            </div>
         </div>
     </div>
-</div>
-<br />
-<!-- Secondary Card -->
-<div class="card" style="padding:1em; background-color:azure">
-    <label class="card-title">Units of Measure</label>
-    <SfGrid DataSource="@UnitOfMeasures"
-            AllowSorting="true"
-            AllowFiltering="true"
-            EnableHover="true"
-            Toolbar="ToolbarItems">
-        <GridSortSettings>
-            <GridSortColumns>
-                <GridSortColumn Field="@nameof(UnitOfMeasure.Name)" Direction="SortDirection.Ascending"></GridSortColumn>
-            </GridSortColumns>
-        </GridSortSettings>
-        <GridEditSettings AllowAdding="true"
-                          AllowEditing="true"
-                          AllowDeleting="true"
-                          AllowEditOnDblClick="true"
-                          ShowDeleteConfirmDialog="true">
-        </GridEditSettings>
-        <GridColumns>
-            <GridColumn Field="@nameof(UnitOfMeasure.Id)" IsPrimaryKey="true" Visible="false"></GridColumn>
-            <GridColumn Field="@nameof(UnitOfMeasure.Name)" HeaderText="Unit of Measure"></GridColumn>
-            <GridColumn HeaderText="Manage" Width="120" AllowFiltering="false">
-                <GridCommandColumns>
-                    <GridCommandColumn Type="CommandButtonType.Edit" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-edit", CssClass = "e-flat" })"></GridCommandColumn>
-                    <GridCommandColumn Type="CommandButtonType.Delete" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-delete", CssClass = "e-flat" })"></GridCommandColumn>
-                    <GridCommandColumn Type="CommandButtonType.Save" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-update", CssClass = "e-flat" })"></GridCommandColumn>
-                    <GridCommandColumn Type="CommandButtonType.Cancel" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-cancel-icon", CssClass = "e-flat" })"></GridCommandColumn>
-                </GridCommandColumns>
-            </GridColumn>
-        </GridColumns>
-        <GridEvents TValue="UnitOfMeasure" OnActionBegin="ActionBeginUnitOfMeasure"></GridEvents>
-    </SfGrid>
-    <style>
-        .e-grid {
-            border-radius: 10px;
-        }
-
-            .e-grid .e-headercell {
-                background-color: #262b2f;
+    <br />
+    <!-- Secondary Card -->
+    <div class="card" style="padding:1em; background-color:azure">
+        <label class="card-title">Units of Measure</label>
+        <SfGrid DataSource="@UnitOfMeasures"
+                AllowSorting="true"
+                AllowFiltering="true"
+                EnableHover="true"
+                Toolbar="ToolbarItems">
+            <GridSortSettings>
+                <GridSortColumns>
+                    <GridSortColumn Field="@nameof(UnitOfMeasure.Name)" Direction="SortDirection.Ascending"></GridSortColumn>
+                </GridSortColumns>
+            </GridSortSettings>
+            <GridEditSettings AllowAdding="true"
+                              AllowEditing="true"
+                              AllowDeleting="true"
+                              AllowEditOnDblClick="true"
+                              ShowDeleteConfirmDialog="true">
+            </GridEditSettings>
+            <GridColumns>
+                <GridColumn Field="@nameof(UnitOfMeasure.Id)" IsPrimaryKey="true" Visible="false"></GridColumn>
+                <GridColumn Field="@nameof(UnitOfMeasure.Name)" HeaderText="Unit of Measure"></GridColumn>
+                <GridColumn HeaderText="Manage" Width="120" AllowFiltering="false">
+                    <GridCommandColumns>
+                        <GridCommandColumn Type="CommandButtonType.Edit" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-edit", CssClass = "e-flat" })"></GridCommandColumn>
+                        <GridCommandColumn Type="CommandButtonType.Delete" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-delete", CssClass = "e-flat" })"></GridCommandColumn>
+                        <GridCommandColumn Type="CommandButtonType.Save" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-update", CssClass = "e-flat" })"></GridCommandColumn>
+                        <GridCommandColumn Type="CommandButtonType.Cancel" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-cancel-icon", CssClass = "e-flat" })"></GridCommandColumn>
+                    </GridCommandColumns>
+                </GridColumn>
+            </GridColumns>
+            <GridEvents TValue="UnitOfMeasure" OnActionBegin="ActionBeginUnitOfMeasure"></GridEvents>
+        </SfGrid>
+        <style>
+            .e-grid {
+                border-radius: 10px;
             }
 
-        .e-gridheader {
-            border-radius: 5px;
-        }
+                .e-grid .e-headercell {
+                    background-color: #262b2f;
+                }
 
-        .e-headercell {
-            color: white;
-        }
-    </style>
+            .e-gridheader {
+                border-radius: 5px;
+            }
+
+            .e-headercell {
+                color: white;
+            }
+        </style>
+    </div>
+
+    <br />
+    <br />
+    <br />
+    <br />
+    <br />
+
 </div>
-
-<br />
-<br />
-<br />
-<br />
-<br />
-
 
 @code {
 

@@ -4,14 +4,16 @@ using GeneralTillApp.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace GeneralTillApp.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210220221908_UpdatedTransactionModel")]
+    partial class UpdatedTransactionModel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -137,14 +139,16 @@ namespace GeneralTillApp.Data.Migrations
                     b.Property<int?>("ProductId")
                         .HasColumnType("int");
 
-                    b.Property<string>("TransactionNumber")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int?>("TransactionId")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("CartItems");
+                    b.HasIndex("TransactionId");
+
+                    b.ToTable("CartItem");
                 });
 
             modelBuilder.Entity("GeneralTillApp.Models.Customer", b =>
@@ -230,24 +234,6 @@ namespace GeneralTillApp.Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("CustomerGroups");
-                });
-
-            modelBuilder.Entity("GeneralTillApp.Models.Payment", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<double>("PaymentAmount")
-                        .HasColumnType("float");
-
-                    b.Property<int>("PaymentType")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Payments");
                 });
 
             modelBuilder.Entity("GeneralTillApp.Models.Product", b =>
@@ -359,21 +345,51 @@ namespace GeneralTillApp.Data.Migrations
                     b.ToTable("ProductGroups");
                 });
 
-            modelBuilder.Entity("GeneralTillApp.Models.Transaction", b =>
+            modelBuilder.Entity("GeneralTillApp.Models.ShoppingCart", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<double>("AmountOwed")
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ShoppingCarts");
+                });
+
+            modelBuilder.Entity("GeneralTillApp.Models.Tax", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<double>("CartGST")
                         .HasColumnType("float");
 
-                    b.Property<double>("AmountOwing")
+                    b.Property<double>("CartPST")
                         .HasColumnType("float");
 
-                    b.Property<double>("AmountPaid")
+                    b.Property<double>("GST")
                         .HasColumnType("float");
+
+                    b.Property<double>("PST")
+                        .HasColumnType("float");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Tax");
+                });
+
+            modelBuilder.Entity("GeneralTillApp.Models.Transaction", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<int>("CustomerId")
                         .HasColumnType("int");
@@ -393,6 +409,9 @@ namespace GeneralTillApp.Data.Migrations
                     b.Property<double>("SubTotal")
                         .HasColumnType("float");
 
+                    b.Property<int?>("TaxId")
+                        .HasColumnType("int");
+
                     b.Property<double>("Total")
                         .HasColumnType("float");
 
@@ -402,6 +421,8 @@ namespace GeneralTillApp.Data.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CustomerId");
+
+                    b.HasIndex("TaxId");
 
                     b.ToTable("Transactions");
                 });
@@ -557,6 +578,10 @@ namespace GeneralTillApp.Data.Migrations
                     b.HasOne("GeneralTillApp.Models.Product", "Product")
                         .WithMany()
                         .HasForeignKey("ProductId");
+
+                    b.HasOne("GeneralTillApp.Models.Transaction", null)
+                        .WithMany("CartItems")
+                        .HasForeignKey("TransactionId");
                 });
 
             modelBuilder.Entity("GeneralTillApp.Models.Customer", b =>
@@ -590,6 +615,10 @@ namespace GeneralTillApp.Data.Migrations
                         .HasForeignKey("CustomerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("GeneralTillApp.Models.Tax", "Tax")
+                        .WithMany()
+                        .HasForeignKey("TaxId");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
