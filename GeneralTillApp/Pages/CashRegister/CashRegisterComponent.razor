@@ -2,6 +2,7 @@
 
 @inject ApplicationDbContext _context
 @inject NavigationManager _navManager
+
 <!--Add a horizontal toolbar to allow for refunds, etc.-->
 <div class="PagePadding">
 
@@ -46,7 +47,7 @@
                 <label class="custom-label-squoval">UPC</label>
                 <input @bind-value="UPC"
                        @bind-value:event="oninput"
-                       @onkeypress="(KeyboardEventArgs arg) => { if (arg.Key == StaticMembers.EnterKey) { CheckUPC(); } }"
+                       @onkeypress="(KeyboardEventArgs arg) => { if (arg.Key == StaticMembers.EnterKey) { CheckUPC(UPC, Quantity, Transaction, SelectedCustomer, CartItems); } }"
                        class="form-control" style="border-radius:30px;" />
             </div>
         </div>
@@ -197,7 +198,7 @@
             </Content>
         </DialogTemplates>
         <DialogButtons>
-            <DialogButton Content="Confirm" @onclick="() => { ClearTransaction(); ClearTransactionDialogVisibility = false; }"></DialogButton>
+            <DialogButton Content="Confirm" @onclick="() => { ClearTransaction(SelectedCustomer); ClearTransactionDialogVisibility = false; }"></DialogButton>
             <DialogButton Content="Cancel" @onclick="() => ClearTransactionDialogVisibility = false"></DialogButton>
         </DialogButtons>
     </SfDialog>
@@ -309,7 +310,7 @@
             </Content>
         </DialogTemplates>
         <DialogButtons>
-            <DialogButton Content="Confirm" @onclick="() => { ClearCartDialogVisibility = false; ClearCart(); }"></DialogButton>
+            <DialogButton Content="Confirm" @onclick="() => { ClearCartDialogVisibility = false; ClearCart(CartItems); }"></DialogButton>
             <DialogButton Content="Cancel" @onclick="() => ClearCartDialogVisibility = false"></DialogButton>
         </DialogButtons>
     </SfDialog>
@@ -340,7 +341,7 @@
             </Content>
         </DialogTemplates>
         <DialogButtons>
-            <DialogButton Content="Select" OnClick="() => { CustomerDialogVisibility = false; CalcTotal(); if (SelectedCustomer != null) { Transaction.Customer = SelectedCustomer; } }"></DialogButton>
+            <DialogButton Content="Select" OnClick="() => { CustomerDialogVisibility = false; CalcTotal(Transaction, CartItems, SelectedCustomer); if (SelectedCustomer != null) { Transaction.Customer = SelectedCustomer; } }"></DialogButton>
             <DialogButton Content="Cancel" OnClick="() => { CustomerDialogVisibility = false; SelectedCustomer = new Customer(); }"></DialogButton>
         </DialogButtons>
     </SfDialog>
@@ -356,7 +357,7 @@
                     <div class="row">
                         <div class="col-2">
                             <label>Discount Percent</label>
-                            <input class="form-control" type="number" @oninput="(e) => { ApplyCartDiscount((string)e.Value, AdjustTypeEnum.Percent); }" />
+                            <input class="form-control" type="number" @oninput="(e) => { ApplyCartDiscount((string)e.Value, AdjustTypeEnum.Percent, CartItems, Transaction, SelectedCustomer); }" />
                         </div>
                         <div class="col-2">
                             <label>New Subtotal</label>
@@ -418,7 +419,7 @@
             </Content>
         </DialogTemplates>
         <DialogButtons>
-            <DialogButton Content="Close" OnClick="() => { AdjustDialogVisibility = false; CalcTotal(); }"></DialogButton>
+            <DialogButton Content="Close" OnClick="() => { AdjustDialogVisibility = false; CalcTotal(Transaction, CartItems, SelectedCustomer); }"></DialogButton>
         </DialogButtons>
     </SfDialog>
 
@@ -438,12 +439,12 @@
 
     #region Visiblity
 
-    public bool AdjustDialogVisibility { get; set; } = false;
-    public bool CustomerDialogVisibility { get; set; } = false;
-    public bool ClearCartDialogVisibility { get; set; }
-    public bool ClearTransactionDialogVisibility { get; set; }
-    public bool RefundDialogVisibility { get; set; }
-    public bool PayDialogVisibility { get; set; }
+    public bool AdjustDialogVisibility { get; private set; } = false;
+    public bool CustomerDialogVisibility { get; private set; } = false;
+    public bool ClearCartDialogVisibility { get; private set; }
+    public bool ClearTransactionDialogVisibility { get; private set; }
+    public bool RefundDialogVisibility { get; private set; }
+    public bool PayDialogVisibility { get; private set; }
 
     #endregion
 
@@ -471,7 +472,7 @@
         {
             _UPC = String.Concat(value.Where(c => !Char.IsWhiteSpace(c)));
             if (_UPC.Length >= 12)
-                CheckUPC();
+                CheckUPC(UPC, Quantity, Transaction, SelectedCustomer, CartItems);
         }
     }
 
@@ -509,15 +510,15 @@
     /// <summary>
     /// Checks to see if input UPC exists in the system, if so, add to current transaction cart
     /// </summary>
-    private void CheckUPC()
+    private void CheckUPC(string upc, int quantity, Transaction transaction, Customer customer, ObservableCollection<CartItem> cartItems)
     {
         var cartItem = new CartItem();
-        cartItem.Product = _context.Products.FirstOrDefault(p => p.UPC == UPC);
+        cartItem.Product = _context.Products.FirstOrDefault(p => p.UPC == upc);
 
         if (cartItem.Product != null)
-            AddToCart(cartItem);
+            AddToCart(cartItem, quantity, transaction, customer, cartItems);
         else
-            Console.WriteLine($"Could not find item with UPC : {UPC}");
+            Console.WriteLine($"Could not find item with UPC : {upc}");
     }
 
     /// <summary>
@@ -525,29 +526,29 @@
     /// </summary>
     /// <param name="cartItem">Cart item found by CheckUPC</param>
 
-    private void AddToCart(CartItem cartItem)
+    private void AddToCart(CartItem cartItem, int quantity, Transaction transaction, Customer customer, ObservableCollection<CartItem> cartItems)
     {
-        cartItem.Count = Quantity;
 
-        if (CartItems.Contains(CartItems.Where(c => c.Product.UPC == cartItem.Product.UPC).FirstOrDefault()))
-        {
-            var index = CartItems.IndexOf(CartItems.Where(c => c.Product.UPC == cartItem.Product.UPC).FirstOrDefault());
-            CartItems[index].Count += cartItem.Count;
-            Duplicate = true;
-        }
+        cartItem.Count = quantity;
 
         // If the item that was scanned is already in cart, follow this flow
+        if (cartItems.Contains(cartItems.Where(c => c.Product.UPC == cartItem.Product.UPC).FirstOrDefault()))
+        {
+            var index = cartItems.IndexOf(cartItems.Where(c => c.Product.UPC == cartItem.Product.UPC).FirstOrDefault());
+            cartItems[index].Count += cartItem.Count;
+            Duplicate = true;
+        }
 
         // If the scanned item is new, follow this flow
         if (!Duplicate)
         {
             CartItems.Add(cartItem);
-            CalcTotal();
+            CalcTotal(transaction, cartItems, customer);
         }
 
         if (Duplicate)
         {
-            CalcTotal();
+            CalcTotal(transaction, cartItems, customer);
             Duplicate = false;
         }
 
@@ -560,7 +561,8 @@
     }
 
     // Validates total cart discount percent and then calls CalcCartDiscountAmount to update the view
-    private void ApplyCartDiscount(string value, AdjustTypeEnum adjustType)
+    private void ApplyCartDiscount(string value, AdjustTypeEnum adjustType, IEnumerable<CartItem> cartItems, Transaction transaction,
+        Customer customer)
     {
         // Checking for any alpha characters
         bool containsLetters = value.Any(x => !char.IsLetter(x));
@@ -572,7 +574,7 @@
 
             if (adjustType == AdjustTypeEnum.Percent)
             {
-                foreach (var cartItem in CartItems)
+                foreach (var cartItem in cartItems)
                 {
                     cartItem.Discounted = true;
                     cartItem.DiscountPercent = convertValue;
@@ -584,7 +586,7 @@
 
             }
 
-            CalcTotal();
+            CalcTotal(transaction, cartItems, customer);
         }
         else
         {
@@ -632,25 +634,26 @@
     }
 
     // Calc the new subtotal for the entire cart **FULL CART**
-    private void CalcCartDiscountSubtotal()
+    // CURRENTLY NOT USED, POSSIBLE REMOVAL IN FUTURE
+    private void CalcCartDiscountSubtotal(Transaction transaction)
     {
         // Reset the discount subtotal each time
-        Transaction.DiscountSubtotal = 0;
+        transaction.DiscountSubtotal = 0;
 
         // Accounting for both disc. perc. and amount
-        if (Transaction.DiscountPercent != 0 && Transaction.DiscountAmount != 0)
+        if (transaction.DiscountPercent != 0 && transaction.DiscountAmount != 0)
         {
-            var tempTotal = Transaction.SubTotal - Transaction.DiscountAmount;
-            Transaction.DiscountSubtotal = tempTotal - (tempTotal * (Transaction.DiscountPercent / 100));
+            var tempTotal = transaction.SubTotal - transaction.DiscountAmount;
+            transaction.DiscountSubtotal = tempTotal - (tempTotal * (transaction.DiscountPercent / 100));
         }
 
         // if only disc. perc is entered
-        else if (Transaction.DiscountPercent >= 0)
-            if (Transaction.DiscountPercent != 0)
-                Transaction.DiscountSubtotal = Transaction.SubTotal - (Transaction.SubTotal * Transaction.DiscountPercent / 100);
+        else if (transaction.DiscountPercent >= 0)
+            if (transaction.DiscountPercent != 0)
+                transaction.DiscountSubtotal = transaction.SubTotal - (transaction.SubTotal * transaction.DiscountPercent / 100);
 
-            else if (Transaction.DiscountAmount >= 0)
-                Transaction.DiscountSubtotal = Transaction.SubTotal - Transaction.DiscountAmount;
+            else if (transaction.DiscountAmount >= 0)
+                transaction.DiscountSubtotal = transaction.SubTotal - transaction.DiscountAmount;
     }
 
     // Calc the new subtotal for the entire cart **INDIVIDUAL ITEMS**
@@ -712,37 +715,37 @@
 
     // This will take in whatever bool was set in the Confirmation changed, if true, clear
     // cart, else close dialog
-    private void ClearCart()
+    private void ClearCart(IEnumerable<CartItem> cartItems)
     {
         CartItems.Clear();
     }
 
     // Clears all cart items and selected customer
-    private void ClearTransaction()
+    private void ClearTransaction(Customer customer)
     {
         SelectedCustomer = new Customer();
         CartItems.Clear();
     }
 
-    // Calc the final total with tax included
-    private void CalcTax()
+    // Calc the final total with tax included TODO :: Implement feature to check tax depending on region 
+    private void CalcTax(Transaction transaction)
     {
-        Transaction.Tax.CartGST = Transaction.SubTotal * 0.05;
-        Transaction.Tax.CartPST = Transaction.SubTotal * 0.07;
-        Transaction.Total = Transaction.SubTotal + Transaction.Tax.CartPST + Transaction.Tax.CartGST;
+        transaction.Tax.CartGST = transaction.SubTotal * 0.05;
+        transaction.Tax.CartPST = transaction.SubTotal * 0.07;
+        transaction.Total = transaction.SubTotal + transaction.Tax.CartPST + transaction.Tax.CartGST;
     }
 
     // Calc total for the cart
-    private void CalcTotal()
+    private void CalcTotal(Transaction transaction, IEnumerable<CartItem> cartItems, Customer customer)
     {
-        Transaction.SubTotal = 0;
-        Transaction.DiscountSubtotal = 0;
+        transaction.SubTotal = 0;
+        transaction.DiscountSubtotal = 0;
 
         // Going over each item in the cart and adding to total
-        foreach (var cartItem in CartItems)
+        foreach (var cartItem in cartItems)
         {
             // Accounting for idv. discounted subtotals
-            if (cartItem.Discounted && SelectedCustomer.DiscountPercent > 0)
+            if (cartItem.Discounted && customer.DiscountPercent > 0)
             {
                 cartItem.CustomerDiscountSavings = 0;
                 cartItem.AdjustDiscountSavings = 0;
@@ -758,21 +761,21 @@
                     Transaction.SubTotal += cartItem.DiscountSubTotal;
                 }
 
-                CalcTax();
+                CalcTax(transaction);
 
             }
-            else if (SelectedCustomer.DiscountPercent > 0)
+            else if (customer.DiscountPercent > 0)
             {
                 cartItem.CustomerDiscountSavings = 0;
 
                 for (var i = 1; i <= cartItem.Count; i++)
                 {
-                    cartItem.CustomerDiscountTotal = cartItem.ItemSubtotal - (cartItem.ItemSubtotal * (SelectedCustomer.DiscountPercent / 100));
+                    cartItem.CustomerDiscountTotal = cartItem.ItemSubtotal - (cartItem.ItemSubtotal * (customer.DiscountPercent / 100));
                     cartItem.CustomerDiscountSavings += cartItem.ItemSubtotal - cartItem.CustomerDiscountTotal;
-                    Transaction.SubTotal += cartItem.CustomerDiscountTotal;
+                    transaction.SubTotal += cartItem.CustomerDiscountTotal;
                 }
 
-                CalcTax();
+                CalcTax(transaction);
 
 
             }
@@ -782,23 +785,23 @@
 
                 for (var i = 1; i <= cartItem.Count; i++)
                 {
-                    Transaction.SubTotal += cartItem.DiscountSubTotal;
+                    transaction.SubTotal += cartItem.DiscountSubTotal;
                     cartItem.AdjustDiscountSavings += cartItem.ItemSubtotal - cartItem.DiscountSubTotal;
                 }
 
-                CalcTax();
+                CalcTax(transaction);
             }
             else
             {
                 cartItem.ItemSubtotal = cartItem.Product.Cost * cartItem.Count;
-                Transaction.SubTotal += cartItem.ItemSubtotal;
+                transaction.SubTotal += cartItem.ItemSubtotal;
 
-                CalcTax();
+                CalcTax(transaction);
             }
         }
 
-        Transaction.AmountOwing = Transaction.Total;
-        Transaction.AmountPaid = Transaction.Total;
+        transaction.AmountOwing = transaction.Total;
+        transaction.AmountPaid = transaction.Total;
     }
 
     private void OnIncrementCounter(object sender, System.EventArgs e)
