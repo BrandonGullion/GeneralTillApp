@@ -6,7 +6,6 @@
 <!--Add a horizontal toolbar to allow for refunds, etc.-->
 <div class="PagePadding">
 
-    <h3>Cash Register</h3>
 
     <!-- Cash register toolbar options TODO :: Break into own component -->
     <div class="cashregister-toolbar">
@@ -22,14 +21,10 @@
 
 
 
-    <!-- Customer Display Widget TODO :: Break into own component -->
+    <!-- Customer Display Widget -->
     @if (!String.IsNullOrWhiteSpace(SelectedCustomer.FirstName))
     {
-        <div class="cashregister-customer-widget">
-            <a>Customer Code : @SelectedCustomer.CustomerCode</a>
-            <a>Customer : @SelectedCustomer.FirstName @SelectedCustomer.LastName</a>
-            <a>Discount : @SelectedCustomer.DiscountPercent%</a>
-        </div>
+        <SelectedCustomerComponent SelectedCustomer="@SelectedCustomer"></SelectedCustomerComponent>
     }
 
 
@@ -47,7 +42,7 @@
                 <label class="custom-label-squoval">UPC</label>
                 <input @bind-value="UPC"
                        @bind-value:event="oninput"
-                       @onkeypress="(KeyboardEventArgs arg) => { if (arg.Key == StaticMembers.EnterKey) { CheckUPC(UPC, Quantity, Transaction, SelectedCustomer, CartItems); } }"
+                       @onkeypress="(KeyboardEventArgs arg) => { if (arg.Key == StaticMembers.EnterKey) { Transaction.CheckUPC(UPC, Quantity, SelectedCustomer, CartItems); } }"
                        class="form-control" style="border-radius:30px;" />
             </div>
         </div>
@@ -66,7 +61,7 @@
                         <GridColumn Width="100px">
                             <Template>
                                 @{
-                                    var cartItem = (context as CartItem);
+                                    var cartItem = (context as Cart);
                                     if (SelectedCustomer != null && SelectedCustomer.DiscountPercent != 0)
                                     {
                                         <div style="margin-top:20px">
@@ -85,7 +80,7 @@
                         <GridColumn HeaderText="Item Subtotal" TextAlign="TextAlign.Center">
                             <Template>
                                 @{
-                                    var cartItem = (context as CartItem);
+                                    var cartItem = (context as Cart);
                                     <div>
                                         <a>@cartItem.ItemSubtotal.ToString("c")</a>
                                     </div>
@@ -172,9 +167,9 @@
                 {
                     SelectedTransaction.CartItems = _context.CartItems.Where(c => c.TransactionNumber.Equals(SelectedTransaction.TransactionNumber)).ToList();
 
-                    <SfGrid TValue="CartItem" DataSource="SelectedTransaction.CartItems">
+                    <SfGrid TValue="Cart" DataSource="SelectedTransaction.CartItems">
                         <GridColumns>
-                            <GridColumn Field="@nameof(CartItem.Product.Title)"></GridColumn>
+                            <GridColumn Field="@nameof(Cart.Product.Title)"></GridColumn>
                         </GridColumns>
                     </SfGrid>
                 }
@@ -341,7 +336,7 @@
             </Content>
         </DialogTemplates>
         <DialogButtons>
-            <DialogButton Content="Select" OnClick="() => { CustomerDialogVisibility = false; CalcTotal(Transaction, CartItems, SelectedCustomer); if (SelectedCustomer != null) { Transaction.Customer = SelectedCustomer; } }"></DialogButton>
+            <DialogButton Content="Select" OnClick="() => { CustomerDialogVisibility = false; Transaction.CalcTotal(CartItems, SelectedCustomer); if (SelectedCustomer != null) { Transaction.Customer = SelectedCustomer; } }"></DialogButton>
             <DialogButton Content="Cancel" OnClick="() => { CustomerDialogVisibility = false; SelectedCustomer = new Customer(); }"></DialogButton>
         </DialogButtons>
     </SfDialog>
@@ -357,24 +352,24 @@
                     <div class="row">
                         <div class="col-2">
                             <label>Discount Percent</label>
-                            <input class="form-control" type="number" @oninput="(e) => { ApplyCartDiscount((string)e.Value, AdjustTypeEnum.Percent, CartItems, Transaction, SelectedCustomer); }" />
+                            <input class="form-control" type="number" @oninput="(e) => { Transaction.ApplyCartDiscount((string)e.Value, AdjustTypeEnum.Percent, CartItems, SelectedCustomer); }" />
                         </div>
                         <div class="col-2">
                             <label>New Subtotal</label>
-                            <div>
-                                <label class="form-control">@Transaction.DiscountSubtotal.ToString("c")</label>
-                            </div>
-                        </div>
-                        <div class="col-2">
-                            <label>Old Subtotal</label>
                             <div>
                                 <label class="form-control">@Transaction.SubTotal.ToString("c")</label>
                             </div>
                         </div>
                         <div class="col-2">
+                            <label>Old Subtotal</label>
+                            <div>
+                                <label class="form-control">@Transaction.OldSubtotal.ToString("c")</label>
+                            </div>
+                        </div>
+                        <div class="col-2">
                             <label>Amount Saved</label>
                             <div>
-                                <label class="form-control">@((Transaction.SubTotal - Transaction.DiscountSubtotal).ToString("c"))</label>
+                                <label class="form-control">@((Transaction.OldSubtotal - Transaction.SubTotal).ToString("c"))</label>
                             </div>
                         </div>
 
@@ -384,11 +379,11 @@
                 <br />
 
                 <!-- Individual Item Edit -->
-                <SfGrid @ref="AdjustDialogCartItemGrid" DataSource="CartItems" TValue="CartItem">
+                <SfGrid @ref="AdjustDialogCartItemGrid" DataSource="Transaction.CartItems" TValue="Cart">
                     <GridTemplates>
                         <RowTemplate>
                             @{
-                                var cartItem = (context as CartItem);
+                                var cartItem = (context as Cart);
                                 <td>
                                     <label>@cartItem.Product.Title</label>
                                 </td>
@@ -396,10 +391,10 @@
                                     <label>@cartItem.Product.Cost.ToString("c")</label>
                                 </td>
                                 <td>
-                                    <input type="number" class="form-control" @oninput="(e) => ApplyIndvItemDiscount(cartItem, e.Value, AdjustTypeEnum.Percent)" />
+                                    <input type="number" class="form-control" @oninput="(e) => Transaction.ApplyIndvItemDiscount(cartItem, e.Value, AdjustTypeEnum.Percent)" />
                                 </td>
                                 <td>
-                                    <input type="number" class="form-control" @oninput="(e) => ApplyIndvItemDiscount(cartItem, e.Value, AdjustTypeEnum.Amount)" />
+                                    <input type="number" class="form-control" @oninput="(e) => Transaction.ApplyIndvItemDiscount(cartItem, e.Value, AdjustTypeEnum.Amount)" />
                                 </td>
                                 <td>
                                     <label type="number" class="form-control">@cartItem.DiscountSubTotal.ToString("c")</label>
@@ -419,7 +414,7 @@
             </Content>
         </DialogTemplates>
         <DialogButtons>
-            <DialogButton Content="Close" OnClick="() => { AdjustDialogVisibility = false; CalcTotal(Transaction, CartItems, SelectedCustomer); }"></DialogButton>
+            <DialogButton Content="Close" OnClick="() => { AdjustDialogVisibility = false; Transaction.CalcTotal(CartItems, SelectedCustomer); }"></DialogButton>
         </DialogButtons>
     </SfDialog>
 
@@ -430,7 +425,6 @@
 
     #region Properties
 
-    public ObservableCollection<CartItem> CartItems { get; set; }
 
     public Transaction Transaction { get; set; }
     public List<Transaction> Transactions { get; set; }
@@ -448,8 +442,8 @@
 
     #endregion
 
-    public SfGrid<CartItem> SfGrid { get; set; }
-    public SfGrid<CartItem> AdjustDialogCartItemGrid { get; set; }
+    public SfGrid<Cart> SfGrid { get; set; }
+    public SfGrid<Cart> AdjustDialogCartItemGrid { get; set; }
 
     public int ProgressValue { get; set; }
 
@@ -472,7 +466,7 @@
         {
             _UPC = String.Concat(value.Where(c => !Char.IsWhiteSpace(c)));
             if (_UPC.Length >= 12)
-                CheckUPC(UPC, Quantity, Transaction, SelectedCustomer, CartItems);
+                Transaction.CheckUPC(UPC, Quantity, SelectedCustomer, CartItems);
         }
     }
 
@@ -484,11 +478,10 @@
     protected override async Task OnInitializedAsync()
     {
         // New Instances 
-        CartItems = new ObservableCollection<CartItem>();
-        Transaction = new Transaction() { Tax = new Tax(), Payments = new List<Payment>() };
+        Transaction = new Transaction(_context) { Tax = new Tax(), Payments = new List<Payment>() };
         PaymentManager = new PaymentManager(_navManager, _context);
         SelectedCustomer = new Customer();
-        SelectedTransaction = new Transaction();
+        SelectedTransaction = new Transaction(_context);
 
         // Other
         Quantity = 1;
@@ -507,215 +500,11 @@
 
     #region Methods
 
-    /// <summary>
-    /// Checks to see if input UPC exists in the system, if so, add to current transaction cart
-    /// </summary>
-    private void CheckUPC(string upc, int quantity, Transaction transaction, Customer customer, ObservableCollection<CartItem> cartItems)
-    {
-        var cartItem = new CartItem();
-        cartItem.Product = _context.Products.FirstOrDefault(p => p.UPC == upc);
 
-        if (cartItem.Product != null)
-            AddToCart(cartItem, quantity, transaction, customer, cartItems);
-        else
-            Console.WriteLine($"Could not find item with UPC : {upc}");
-    }
 
-    /// <summary>
-    /// Add a cart item to the observable list, update the grid and any values that were changed with the addition
-    /// </summary>
-    /// <param name="cartItem">Cart item found by CheckUPC</param>
-
-    private void AddToCart(CartItem cartItem, int quantity, Transaction transaction, Customer customer, ObservableCollection<CartItem> cartItems)
-    {
-
-        cartItem.Count = quantity;
-
-        // If the item that was scanned is already in cart, follow this flow
-        if (cartItems.Contains(cartItems.Where(c => c.Product.UPC == cartItem.Product.UPC).FirstOrDefault()))
-        {
-            var index = cartItems.IndexOf(cartItems.Where(c => c.Product.UPC == cartItem.Product.UPC).FirstOrDefault());
-            cartItems[index].Count += cartItem.Count;
-            Duplicate = true;
-        }
-
-        // If the scanned item is new, follow this flow
-        if (!Duplicate)
-        {
-            CartItems.Add(cartItem);
-            CalcTotal(transaction, cartItems, customer);
-        }
-
-        if (Duplicate)
-        {
-            CalcTotal(transaction, cartItems, customer);
-            Duplicate = false;
-        }
-
-        // Reset the item scan variables
-        Quantity = 1;
-        UPC = string.Empty;
-
-        SfGrid.Refresh();
-        StateHasChanged();
-    }
-
-    // Validates total cart discount percent and then calls CalcCartDiscountAmount to update the view
-    private void ApplyCartDiscount(string value, AdjustTypeEnum adjustType, IEnumerable<CartItem> cartItems, Transaction transaction,
-        Customer customer)
-    {
-        // Checking for any alpha characters
-        bool containsLetters = value.Any(x => !char.IsLetter(x));
-
-        // If none convert to double and pass to calc whole cart discount
-        if (containsLetters)
-        {
-            var convertValue = Convert.ToDouble(value);
-
-            if (adjustType == AdjustTypeEnum.Percent)
-            {
-                foreach (var cartItem in cartItems)
-                {
-                    cartItem.Discounted = true;
-                    cartItem.DiscountPercent = convertValue;
-                    CalcCartItemDiscount(cartItem);
-                }
-            }
-            else if (adjustType == AdjustTypeEnum.Amount)
-            {
-
-            }
-
-            CalcTotal(transaction, cartItems, customer);
-        }
-        else
-        {
-            //TODO :: Inform that no alphabetical characters are allowed
-            Console.WriteLine("Not allowed character in the discount field");
-        }
-    }
-
-    // Validates indv cart item percent and calls CalcCartItemDiscount to update view
-    private void ApplyIndvItemDiscount(CartItem value, object percent, AdjustTypeEnum adjustType)
-    {
-        // Checking for any alpha characters
-        bool containsLetters = percent.ToString().Any(x => !char.IsLetter(x));
-
-        // If no alpha calc indv item discounted value
-        if (containsLetters)
-        {
-            var discountValue = Convert.ToDouble(percent);
-
-            if (adjustType == AdjustTypeEnum.Percent)
-            {
-                if (value.DiscountPercent >= 0)
-                {
-                    value.DiscountPercent = discountValue;
-                    value.PercentDiscountedBool = true;
-                    value.Discounted = true;
-                    CalcCartItemDiscount(value);
-                }
-            }
-            else if (adjustType == AdjustTypeEnum.Amount)
-            {
-                if (value.DiscountAmount >= 0)
-                {
-                    value.DiscountAmount = discountValue;
-                    value.AmountDiscountedBool = true;
-                    value.Discounted = true;
-                    CalcCartItemDiscount(value);
-                }
-            }
-        }
-        else
-        {
-            Console.WriteLine("Not allowed character in the discount field");
-        }
-    }
-
-    // Calc the new subtotal for the entire cart **FULL CART**
-    // CURRENTLY NOT USED, POSSIBLE REMOVAL IN FUTURE
-    private void CalcCartDiscountSubtotal(Transaction transaction)
-    {
-        // Reset the discount subtotal each time
-        transaction.DiscountSubtotal = 0;
-
-        // Accounting for both disc. perc. and amount
-        if (transaction.DiscountPercent != 0 && transaction.DiscountAmount != 0)
-        {
-            var tempTotal = transaction.SubTotal - transaction.DiscountAmount;
-            transaction.DiscountSubtotal = tempTotal - (tempTotal * (transaction.DiscountPercent / 100));
-        }
-
-        // if only disc. perc is entered
-        else if (transaction.DiscountPercent >= 0)
-            if (transaction.DiscountPercent != 0)
-                transaction.DiscountSubtotal = transaction.SubTotal - (transaction.SubTotal * transaction.DiscountPercent / 100);
-
-            else if (transaction.DiscountAmount >= 0)
-                transaction.DiscountSubtotal = transaction.SubTotal - transaction.DiscountAmount;
-    }
-
-    // Calc the new subtotal for the entire cart **INDIVIDUAL ITEMS**
-    // Also allows for calc when customer discount is involved
-    // TODO :: Implement singular item discounts
-    private void CalcCartItemDiscount(CartItem cartItem)
-    {
-        cartItem.DiscountSubTotal = 0;
-
-        // Only used if there is a customer discount along with adjust discount applied, uses
-        // CustomerDiscountTotal from Calc()
-        if (cartItem.CustomerDiscountTotal > 0)
-        {
-            if (cartItem.AmountDiscountedBool && cartItem.PercentDiscountedBool)
-            {
-                var tempTotal = cartItem.CustomerDiscountTotal - cartItem.DiscountAmount;
-                cartItem.DiscountSubTotal = tempTotal - (tempTotal * (cartItem.DiscountPercent / 100));
-            }
-
-            else if (cartItem.DiscountPercent > 0)
-            {
-                cartItem.DiscountSubTotal = cartItem.CustomerDiscountTotal - (cartItem.CustomerDiscountTotal * cartItem.DiscountPercent / 100);
-            }
-
-            else if (cartItem.DiscountAmount >= 0)
-            {
-                cartItem.DiscountSubTotal = cartItem.CustomerDiscountTotal - cartItem.DiscountAmount;
-            }
-
-            else if (cartItem.DiscountPercent == 0)
-            {
-                cartItem.DiscountSubTotal = cartItem.CustomerDiscountTotal;
-            }
-        }
-        else
-        {
-            if (cartItem.AmountDiscountedBool && cartItem.PercentDiscountedBool)
-            {
-                var tempTotal = cartItem.Product.Cost - cartItem.DiscountAmount;
-                cartItem.DiscountSubTotal = tempTotal - (tempTotal * (cartItem.DiscountPercent / 100));
-            }
-
-            else if (cartItem.DiscountPercent > 0)
-            {
-                cartItem.DiscountSubTotal = cartItem.Product.Cost - (cartItem.Product.Cost * cartItem.DiscountPercent / 100);
-            }
-
-            else if (cartItem.DiscountAmount >= 0)
-            {
-                cartItem.DiscountSubTotal = cartItem.Product.Cost - cartItem.DiscountAmount;
-            }
-
-            else if (cartItem.DiscountPercent == 0)
-            {
-                cartItem.DiscountSubTotal = cartItem.Product.Cost;
-            }
-        }
-    }
-
-    // This will take in whatever bool was set in the Confirmation changed, if true, clear
-    // cart, else close dialog
-    private void ClearCart(IEnumerable<CartItem> cartItems)
+    /* This will take in whatever bool was set in the Confirmation changed, if true, clear
+        cart, else close dialog */
+    public void ClearCart(IEnumerable<Cart> cartItems)
     {
         CartItems.Clear();
     }
@@ -725,83 +514,6 @@
     {
         SelectedCustomer = new Customer();
         CartItems.Clear();
-    }
-
-    // Calc the final total with tax included TODO :: Implement feature to check tax depending on region 
-    private void CalcTax(Transaction transaction)
-    {
-        transaction.Tax.CartGST = transaction.SubTotal * 0.05;
-        transaction.Tax.CartPST = transaction.SubTotal * 0.07;
-        transaction.Total = transaction.SubTotal + transaction.Tax.CartPST + transaction.Tax.CartGST;
-    }
-
-    // Calc total for the cart
-    private void CalcTotal(Transaction transaction, IEnumerable<CartItem> cartItems, Customer customer)
-    {
-        transaction.SubTotal = 0;
-        transaction.DiscountSubtotal = 0;
-
-        // Going over each item in the cart and adding to total
-        foreach (var cartItem in cartItems)
-        {
-            // Accounting for idv. discounted subtotals
-            if (cartItem.Discounted && customer.DiscountPercent > 0)
-            {
-                cartItem.CustomerDiscountSavings = 0;
-                cartItem.AdjustDiscountSavings = 0;
-
-                for (var i = 1; i <= cartItem.Count; i++)
-                {
-                    cartItem.DiscountSubTotal = 0;
-                    cartItem.CustomerDiscountTotal = cartItem.ItemSubtotal - (cartItem.ItemSubtotal * (SelectedCustomer.DiscountPercent / 100));
-                    cartItem.CustomerDiscountSavings += cartItem.ItemSubtotal - cartItem.CustomerDiscountTotal;
-
-                    CalcCartItemDiscount(cartItem);
-                    cartItem.AdjustDiscountSavings += cartItem.CustomerDiscountTotal - cartItem.DiscountSubTotal;
-                    Transaction.SubTotal += cartItem.DiscountSubTotal;
-                }
-
-                CalcTax(transaction);
-
-            }
-            else if (customer.DiscountPercent > 0)
-            {
-                cartItem.CustomerDiscountSavings = 0;
-
-                for (var i = 1; i <= cartItem.Count; i++)
-                {
-                    cartItem.CustomerDiscountTotal = cartItem.ItemSubtotal - (cartItem.ItemSubtotal * (customer.DiscountPercent / 100));
-                    cartItem.CustomerDiscountSavings += cartItem.ItemSubtotal - cartItem.CustomerDiscountTotal;
-                    transaction.SubTotal += cartItem.CustomerDiscountTotal;
-                }
-
-                CalcTax(transaction);
-
-
-            }
-            else if (cartItem.Discounted)
-            {
-                cartItem.AdjustDiscountSavings = 0;
-
-                for (var i = 1; i <= cartItem.Count; i++)
-                {
-                    transaction.SubTotal += cartItem.DiscountSubTotal;
-                    cartItem.AdjustDiscountSavings += cartItem.ItemSubtotal - cartItem.DiscountSubTotal;
-                }
-
-                CalcTax(transaction);
-            }
-            else
-            {
-                cartItem.ItemSubtotal = cartItem.Product.Cost * cartItem.Count;
-                transaction.SubTotal += cartItem.ItemSubtotal;
-
-                CalcTax(transaction);
-            }
-        }
-
-        transaction.AmountOwing = transaction.Total;
-        transaction.AmountPaid = transaction.Total;
     }
 
     private void OnIncrementCounter(object sender, System.EventArgs e)

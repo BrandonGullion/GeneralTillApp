@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace GeneralTillApp.Models
 {
-    public class Product
+    public class Product : IProduct
     {
         public int Id { get; set; }
         [Required]
@@ -19,8 +19,6 @@ namespace GeneralTillApp.Models
         public string UPC { get; set; }
 
         public bool Discountable { get; set; }
-        public int QtyDiscounted { get; set; }
-        public int QtyPurchaseLimit { get; set; }
 
         public bool PST { get; set; }
         public bool GST { get; set; }

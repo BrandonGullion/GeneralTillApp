@@ -14,7 +14,7 @@ namespace GeneralTillApp.Data
 
         public DbSet<Customer> Customers { get; set; }
         public DbSet<CustomerGroup> CustomerGroups { get; set; }
-        public DbSet<CartItem> CartItems { get; set; }
+        public DbSet<Cart> CartItems { get; set; }
 
         public DbSet<UnitOfMeasure> UnitOfMeasures { get; set; }
         public DbSet<CustomUser> CustomUsers { get; set; }

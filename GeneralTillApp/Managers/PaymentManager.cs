@@ -50,7 +50,7 @@ namespace GeneralTillApp.Managers
         #region Methods
 
 
-        public async Task<Transaction> MakePayment(Transaction transaction, PaymentTypeEnum paymentType, IEnumerable<CartItem> cartItems)
+        public async Task<Transaction> MakePayment(Transaction transaction, PaymentTypeEnum paymentType, IEnumerable<Cart> cartItems)
         {
             // Always sets the payment success to false to make sure there are no false approvals
             PaymentStatus = PaymentStatusEnum.None;

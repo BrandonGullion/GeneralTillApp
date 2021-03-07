@@ -1,0 +1,12 @@
+﻿
+<div class="cashregister-customer-widget">
+    <a>Customer Code : @SelectedCustomer.CustomerCode</a>
+    <a>Customer : @SelectedCustomer.FirstName @SelectedCustomer.LastName</a>
+    <a>Discount : @SelectedCustomer.DiscountPercent%</a>
+</div>
+
+@code {
+
+    [Parameter]
+    public Customer SelectedCustomer { get; set; }
+}
