@@ -42,7 +42,7 @@
                 <label class="custom-label-squoval">UPC</label>
                 <input @bind-value="UPC"
                        @bind-value:event="oninput"
-                       @onkeypress="(KeyboardEventArgs arg) => { if (arg.Key == StaticMembers.EnterKey) { Transaction.CheckUPC(UPC, Quantity, SelectedCustomer, CartItems); } }"
+                       @onkeypress="(KeyboardEventArgs arg) => { if (arg.Key == StaticMembers.EnterKey) { Transaction.CheckUPC(UPC, Quantity); } }"
                        class="form-control" style="border-radius:30px;" />
             </div>
         </div>
@@ -52,23 +52,23 @@
         <!-- Cart Item List -->
         <div class="row" style="margin-left:0px">
             <div style="width:65%">
-                <SfGrid @ref="SfGrid" DataSource="CartItems">
+                <SfGrid @ref="SfGrid" DataSource="Transaction.Cart.CartProducts">
                     <GridColumns>
-                        <GridColumn Field="Product.Title" HeaderText="Product"></GridColumn>
-                        <GridColumn Field="Product.UPC" HeaderText="UPC"></GridColumn>
-                        <GridColumn Field="Product.Cost" HeaderText="Price($)" Format="c" TextAlign="TextAlign.Center"></GridColumn>
-                        <GridColumn Field="Count" TextAlign="TextAlign.Center" Edit="true"></GridColumn>
+                        <GridColumn Field="@nameof(CartProduct.Title)" HeaderText="Product"></GridColumn>
+                        <GridColumn Field="@nameof(CartProduct.UPC)" HeaderText="UPC"></GridColumn>
+                        <GridColumn Field="@nameof(CartProduct.Cost)" HeaderText="Price($)" Format="c" TextAlign="TextAlign.Center"></GridColumn>
+                        <GridColumn Field="@nameof(CartProduct.QtyInCart)" TextAlign="TextAlign.Center" Edit="true"></GridColumn>
                         <GridColumn Width="100px">
                             <Template>
                                 @{
-                                    var cartItem = (context as Cart);
+                                    var cartProduct = (context as CartProduct);
                                     if (SelectedCustomer != null && SelectedCustomer.DiscountPercent != 0)
                                     {
                                         <div style="margin-top:20px">
                                             <a>Customer Discount :</a>
                                         </div>
                                     }
-                                    if (cartItem.Discounted)
+                                    if (cartProduct.Discounted)
                                     {
                                         <div>
                                             <a>Applied Discount : </a>
@@ -80,20 +80,21 @@
                         <GridColumn HeaderText="Item Subtotal" TextAlign="TextAlign.Center">
                             <Template>
                                 @{
-                                    var cartItem = (context as Cart);
+                                    var cartProduct = (context as CartProduct);
                                     <div>
-                                        <a>@cartItem.ItemSubtotal.ToString("c")</a>
+                                        <a>@(cartProduct.Cost * cartProduct.QtyInCart)</a>
                                     </div>
+        
                                     if (SelectedCustomer != null && SelectedCustomer.DiscountPercent != 0)
                                     {
                                         <div>
-                                            <a style="margin-right:10px"> - @cartItem.CustomerDiscountSavings.ToString("c")</a>
+                                            <a>@cartProduct.CustomerSavings.ToString("C2")</a>
                                         </div>
                                     }
-                                    if (cartItem.Discounted)
+                                    if (cartProduct.Discounted)
                                     {
                                         <div>
-                                            <a style="margin-right:10px">- @cartItem.AdjustDiscountSavings.ToString("c")</a>
+
                                         </div>
                                     }
                                 }
@@ -165,11 +166,12 @@
 
                 @if (!String.IsNullOrWhiteSpace(SelectedTransaction.TransactionNumber))
                 {
-                    SelectedTransaction.CartItems = _context.CartItems.Where(c => c.TransactionNumber.Equals(SelectedTransaction.TransactionNumber)).ToList();
+                    // Need to fix once the transaction has been finished and updated 
+                    // SelectedTransaction.CartItems = _context.CartItems.Where(c => c.TransactionNumber.Equals(SelectedTransaction.TransactionNumber)).ToList();
 
-                    <SfGrid TValue="Cart" DataSource="SelectedTransaction.CartItems">
+                    <SfGrid TValue="CartProduct" DataSource="SelectedTransaction.Cart.CartProducts">
                         <GridColumns>
-                            <GridColumn Field="@nameof(Cart.Product.Title)"></GridColumn>
+                            <GridColumn Field="@nameof(CartProduct.Title)"></GridColumn>
                         </GridColumns>
                     </SfGrid>
                 }
@@ -193,7 +195,7 @@
             </Content>
         </DialogTemplates>
         <DialogButtons>
-            <DialogButton Content="Confirm" @onclick="() => { ClearTransaction(SelectedCustomer); ClearTransactionDialogVisibility = false; }"></DialogButton>
+            <DialogButton Content="Confirm" @onclick="() => { Transaction.ClearTransaction(); ClearTransactionDialogVisibility = false; }"></DialogButton>
             <DialogButton Content="Cancel" @onclick="() => ClearTransactionDialogVisibility = false"></DialogButton>
         </DialogButtons>
     </SfDialog>
@@ -288,7 +290,7 @@
                                         if (!PaymentManager.PaymentRunning)
                                         {
                                             PaymentManager.PaymentRunning = true;
-                                            Transaction = await PaymentManager.MakePayment(Transaction, PaymentType, CartItems);
+                                            // Transaction = await PaymentManager.MakePayment(Transaction, PaymentType, CartItems);
                                         }
                                     }"
                           Content="Accept"></DialogButton>
@@ -305,7 +307,7 @@
             </Content>
         </DialogTemplates>
         <DialogButtons>
-            <DialogButton Content="Confirm" @onclick="() => { ClearCartDialogVisibility = false; ClearCart(CartItems); }"></DialogButton>
+            <DialogButton Content="Confirm" @onclick="() => { ClearCartDialogVisibility = false; Transaction.Cart.ClearCart(); }"></DialogButton>
             <DialogButton Content="Cancel" @onclick="() => ClearCartDialogVisibility = false"></DialogButton>
         </DialogButtons>
     </SfDialog>
@@ -336,7 +338,7 @@
             </Content>
         </DialogTemplates>
         <DialogButtons>
-            <DialogButton Content="Select" OnClick="() => { CustomerDialogVisibility = false; Transaction.CalcTotal(CartItems, SelectedCustomer); if (SelectedCustomer != null) { Transaction.Customer = SelectedCustomer; } }"></DialogButton>
+            <DialogButton Content="Select" OnClick="() => { CustomerDialogVisibility = false; Transaction.CalcTotal(SelectedCustomer); if (SelectedCustomer != null) { Transaction.Customer = SelectedCustomer; } }"></DialogButton>
             <DialogButton Content="Cancel" OnClick="() => { CustomerDialogVisibility = false; SelectedCustomer = new Customer(); }"></DialogButton>
         </DialogButtons>
     </SfDialog>
@@ -352,7 +354,7 @@
                     <div class="row">
                         <div class="col-2">
                             <label>Discount Percent</label>
-                            <input class="form-control" type="number" @oninput="(e) => { Transaction.ApplyCartDiscount((string)e.Value, AdjustTypeEnum.Percent, CartItems, SelectedCustomer); }" />
+                            <input class="form-control" type="number" @oninput="(e) => { Transaction.Cart.ApplyCartDiscount((string)e.Value, AdjustTypeEnum.Percent); }" />
                         </div>
                         <div class="col-2">
                             <label>New Subtotal</label>
@@ -379,25 +381,24 @@
                 <br />
 
                 <!-- Individual Item Edit -->
-                <SfGrid @ref="AdjustDialogCartItemGrid" DataSource="Transaction.CartItems" TValue="Cart">
+                <SfGrid @ref="AdjustDialogCartItemGrid" DataSource="Transaction.Cart.CartProducts" TValue="CartProduct">
                     <GridTemplates>
                         <RowTemplate>
                             @{
-                                var cartItem = (context as Cart);
+                                var cartProduct = (context as CartProduct);
                                 <td>
-                                    <label>@cartItem.Product.Title</label>
+                                    <label>@cartProduct.Title</label>
                                 </td>
                                 <td>
-                                    <label>@cartItem.Product.Cost.ToString("c")</label>
+                                    <label>@cartProduct.Cost.ToString("c")</label>
                                 </td>
                                 <td>
-                                    <input type="number" class="form-control" @oninput="(e) => Transaction.ApplyIndvItemDiscount(cartItem, e.Value, AdjustTypeEnum.Percent)" />
+                                    <input type="number" class="form-control" @oninput="(e) => Transaction.Cart.ApplyIndvItemDiscount(cartProduct, e.Value, AdjustTypeEnum.Percent)" />
                                 </td>
                                 <td>
-                                    <input type="number" class="form-control" @oninput="(e) => Transaction.ApplyIndvItemDiscount(cartItem, e.Value, AdjustTypeEnum.Amount)" />
+                                    <input type="number" class="form-control" @oninput="(e) => Transaction.Cart.ApplyIndvItemDiscount(cartProduct, e.Value, AdjustTypeEnum.Amount)" />
                                 </td>
                                 <td>
-                                    <label type="number" class="form-control">@cartItem.DiscountSubTotal.ToString("c")</label>
                                 </td>
                             }
                         </RowTemplate>
@@ -414,7 +415,7 @@
             </Content>
         </DialogTemplates>
         <DialogButtons>
-            <DialogButton Content="Close" OnClick="() => { AdjustDialogVisibility = false; Transaction.CalcTotal(CartItems, SelectedCustomer); }"></DialogButton>
+            <DialogButton Content="Close" OnClick="() => { AdjustDialogVisibility = false; Transaction.CalcTotal(SelectedCustomer); }"></DialogButton>
         </DialogButtons>
     </SfDialog>
 
@@ -442,8 +443,8 @@
 
     #endregion
 
-    public SfGrid<Cart> SfGrid { get; set; }
-    public SfGrid<Cart> AdjustDialogCartItemGrid { get; set; }
+    public SfGrid<CartProduct> SfGrid { get; set; }
+    public SfGrid<CartProduct> AdjustDialogCartItemGrid { get; set; }
 
     public int ProgressValue { get; set; }
 
@@ -466,7 +467,11 @@
         {
             _UPC = String.Concat(value.Where(c => !Char.IsWhiteSpace(c)));
             if (_UPC.Length >= 12)
-                Transaction.CheckUPC(UPC, Quantity, SelectedCustomer, CartItems);
+            {
+                Transaction.CheckUPC(UPC, Quantity);
+                SfGrid.Refresh();
+                StateHasChanged();
+            }
         }
     }
 
@@ -492,29 +497,13 @@
 
         // List init 
         Customers = await _context.Customers.ToListAsync();
-        Transactions = await _context.Transactions.Where(t => t.PurchaseDate > DateTime.Now.AddDays(-30)).ToListAsync();
+        // Transactions = await _context.Transactions.Where(t => t.PurchaseDate > DateTime.Now.AddDays(-30)).ToListAsync();
     }
 
 
     #endregion
 
     #region Methods
-
-
-
-    /* This will take in whatever bool was set in the Confirmation changed, if true, clear
-        cart, else close dialog */
-    public void ClearCart(IEnumerable<Cart> cartItems)
-    {
-        CartItems.Clear();
-    }
-
-    // Clears all cart items and selected customer
-    private void ClearTransaction(Customer customer)
-    {
-        SelectedCustomer = new Customer();
-        CartItems.Clear();
-    }
 
     private void OnIncrementCounter(object sender, System.EventArgs e)
     {

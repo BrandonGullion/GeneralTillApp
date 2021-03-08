@@ -50,14 +50,11 @@ namespace GeneralTillApp.Managers
         #region Methods
 
 
-        public async Task<Transaction> MakePayment(Transaction transaction, PaymentTypeEnum paymentType, IEnumerable<Cart> cartItems)
+        public async Task<Transaction> MakePayment(Transaction transaction, PaymentTypeEnum paymentType)
         {
             // Always sets the payment success to false to make sure there are no false approvals
             PaymentStatus = PaymentStatusEnum.None;
             BeginCounter();
-
-            transaction.CartItems = cartItems;
-
 
             if (paymentType == PaymentTypeEnum.Park)
             {
@@ -150,12 +147,6 @@ namespace GeneralTillApp.Managers
             {
                 transaction.PurchaseDate = DateTime.Now;
                 transaction.TransactionNumber = GenerateTransactionNumber(transaction.PurchaseDate);
-
-                foreach (var cartItem in transaction.CartItems)
-                {
-                    cartItem.TransactionNumber = transaction.TransactionNumber;
-                    _context.CartItems.Add(cartItem);
-                }
 
                 if (transaction.Customer == null)
                     transaction.Customer = _context.Customers.Where(c => c.FirstName == "None").FirstOrDefault();
