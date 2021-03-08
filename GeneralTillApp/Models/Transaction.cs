@@ -70,7 +70,7 @@ namespace GeneralTillApp.Models
             if (Cart.CartProduct != null)
             {
                 Cart.AddProductToCart(quantity);
-               CalcTotal(Customer);
+               CalculateTotal(Customer);
             }
             else
                 Console.WriteLine($"Could not find item with UPC : {upc}");
@@ -86,40 +86,39 @@ namespace GeneralTillApp.Models
         }
 
         // Calculates the total of all product prices in the cart items list 
-        public void CalcTotal(Customer customer)
+        public void CalculateTotal(Customer customer)
         {
             SubTotal = 0;
             DiscountSubtotal = 0;
             OldSubtotal = 0;
 
             // Going over each item in the cart and adding to total
-            foreach (var cartItem in Cart.CartProducts)
+            foreach (var cartProduct in Cart.CartProducts)
             {
                 // Accounting for idv. discounted subtotals
 
                 // If both the item and the customer have discounts 
-                if (cartItem.Discounted && customer.DiscountPercent > 0)
+                if (cartProduct.Discounted && customer.DiscountPercent > 0)
                 {
 
-                    CalcTax();
                 }
                 // If customer discount is appropriate 
                 else if (customer.DiscountPercent > 0)
                 {
-
-                    CalcTax();
                 }
                 // If the item is discounted itself 
-                else if (cartItem.Discounted)
+                else if (cartProduct.Discounted)
                 {
-                    CalcTax();
                 }
                 // No discounts 
                 else
                 {
-                   CalcTax();
+                    SubTotal += cartProduct.Price;
                 }
             }
+
+            // Calculate the taxes against the sub total 
+            CalcTax();
 
             AmountOwing = Total;
             AmountPaid = Total;

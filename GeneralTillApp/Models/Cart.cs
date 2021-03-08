@@ -43,7 +43,7 @@ namespace GeneralTillApp.Models
             var Duplicate = false;
 
             // If the item that was scanned is already in cart, follow this flow
-            if (CartProducts.Contains(CartProduct))
+            if (CartProducts.Contains(CartProducts.Where(c => c.UPC == CartProduct.UPC).FirstOrDefault()))
             {
                 var index = CartProducts.IndexOf(CartProducts.Where(c => c.UPC == CartProduct.UPC).FirstOrDefault());
                 CartProducts[index].QtyInCart += quantity;
@@ -51,16 +51,15 @@ namespace GeneralTillApp.Models
             }
 
             // If the scanned item is new, follow this flow
-            if (!Duplicate)
+            if (!Duplicate) 
+            {
+                CartProduct.QtyInCart = quantity;
                 CartProducts.Add(CartProduct);
+            }
 
             // If already in the cart follow this flow after count has been updated 
             if (Duplicate)
                 Duplicate = false;
-
-
-            // SfGrid.Refresh();
-            // StateHasChanged();
         }
 
         // Calcs item discounts 
@@ -97,29 +96,29 @@ namespace GeneralTillApp.Models
             {
                 if (AmountDiscountedBool && PercentDiscountedBool)
                 {
-                    var tempTotal = CartProduct.Cost - DiscountAmount;
+                    var tempTotal = CartProduct.Price - DiscountAmount;
                     DiscountSubTotal = tempTotal - (tempTotal * (DiscountPercent / 100));
                 }
 
                 else if (DiscountPercent > 0)
                 {
-                    DiscountSubTotal = CartProduct.Cost - (CartProduct.Cost * DiscountPercent / 100);
+                    DiscountSubTotal = CartProduct.Price - (CartProduct.Price * DiscountPercent / 100);
                 }
 
                 else if (DiscountAmount >= 0)
                 {
-                    DiscountSubTotal = CartProduct.Cost - DiscountAmount;
+                    DiscountSubTotal = CartProduct.Price - DiscountAmount;
                 }
 
                 else if (DiscountPercent == 0)
                 {
-                    DiscountSubTotal = CartProduct.Cost;
+                    DiscountSubTotal = CartProduct.Price;
                 }
             }
         }
 
         // Validates total cart discount percent and then calls CalcCartDiscountAmount to update the view
-        public void ApplyCartDiscount(string value, AdjustTypeEnum adjustType)
+        public void ApplyCartDiscount(string value, DiscountTypeEnum adjustType)
         {
             // Checking for any alpha characters
             bool containsLetters = value.Any(x => !char.IsLetter(x));
@@ -129,16 +128,16 @@ namespace GeneralTillApp.Models
             {
                 var convertValue = Convert.ToDouble(value);
 
-                if (adjustType == AdjustTypeEnum.Percent)
+                if (adjustType == DiscountTypeEnum.Percent)
                 {
-                    foreach (var cartItem in CartProducts)
+                    foreach (var cartProduct in CartProducts)
                     {
-                        cartItem.Discounted = true;
-                        cartItem.DiscountPercent = convertValue;
+                        cartProduct.Discounted = true;
+                        cartProduct.DiscountPercent = convertValue;
                         CalcCartItemDiscount();
                     }
                 }
-                else if (adjustType == AdjustTypeEnum.Amount)
+                else if (adjustType == DiscountTypeEnum.Amount)
                 {
 
                 }
@@ -151,7 +150,7 @@ namespace GeneralTillApp.Models
         }
 
         // Validates indv cart item percent and calls CalcCartItemDiscount to update view
-        public void ApplyIndvItemDiscount(CartProduct cartProduct, object percent, AdjustTypeEnum adjustType)
+        public void ApplyIndvItemDiscount(CartProduct cartProduct, object percent, DiscountTypeEnum adjustType)
         {
             // Checking for any alpha characters
             bool containsLetters = percent.ToString().Any(x => !char.IsLetter(x));
@@ -161,7 +160,7 @@ namespace GeneralTillApp.Models
             {
                 var discountValue = Convert.ToDouble(percent);
 
-                if (adjustType == AdjustTypeEnum.Percent)
+                if (adjustType == DiscountTypeEnum.Percent)
                 {
                     if (cartProduct.DiscountPercent >= 0)
                     {
@@ -170,7 +169,7 @@ namespace GeneralTillApp.Models
                         CalcCartItemDiscount();
                     }
                 }
-                else if (adjustType == AdjustTypeEnum.Amount)
+                else if (adjustType == DiscountTypeEnum.Amount)
                 {
                     if (cartProduct.DiscountAmount >= 0)
                     {

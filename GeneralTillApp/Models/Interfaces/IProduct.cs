@@ -5,7 +5,7 @@ namespace GeneralTillApp.Models
     public interface IProduct
     {
         double AcqCost { get; set; }
-        double Cost { get; set; }
+        double Price { get; set; }
         DateTime DateAdded { get; set; }
         string Description { get; set; }
         bool Discountable { get; set; }

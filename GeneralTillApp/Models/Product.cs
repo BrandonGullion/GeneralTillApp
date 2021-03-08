@@ -34,7 +34,7 @@ namespace GeneralTillApp.Models
         public int ProductGroupId { get; set; }
         [ForeignKey(nameof(ProductGroupId))]
         public ProductGroup ProductGroup { get; set; }
-        public double Cost { get; set; }
+        public double Price { get; set; }
         public double AcqCost { get; set; }
 
         [NotMapped]

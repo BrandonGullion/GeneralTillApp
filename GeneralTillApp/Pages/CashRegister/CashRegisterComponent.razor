@@ -56,7 +56,7 @@
                     <GridColumns>
                         <GridColumn Field="@nameof(CartProduct.Title)" HeaderText="Product"></GridColumn>
                         <GridColumn Field="@nameof(CartProduct.UPC)" HeaderText="UPC"></GridColumn>
-                        <GridColumn Field="@nameof(CartProduct.Cost)" HeaderText="Price($)" Format="c" TextAlign="TextAlign.Center"></GridColumn>
+                        <GridColumn Field="@nameof(CartProduct.Price)" HeaderText="Price($)" Format="c" TextAlign="TextAlign.Center"></GridColumn>
                         <GridColumn Field="@nameof(CartProduct.QtyInCart)" TextAlign="TextAlign.Center" Edit="true"></GridColumn>
                         <GridColumn Width="100px">
                             <Template>
@@ -82,7 +82,7 @@
                                 @{
                                     var cartProduct = (context as CartProduct);
                                     <div>
-                                        <a>@(cartProduct.Cost * cartProduct.QtyInCart)</a>
+                                        <a>@((cartProduct.Price * cartProduct.QtyInCart).ToString("C2"))</a>
                                     </div>
         
                                     if (SelectedCustomer != null && SelectedCustomer.DiscountPercent != 0)
@@ -338,7 +338,7 @@
             </Content>
         </DialogTemplates>
         <DialogButtons>
-            <DialogButton Content="Select" OnClick="() => { CustomerDialogVisibility = false; Transaction.CalcTotal(SelectedCustomer); if (SelectedCustomer != null) { Transaction.Customer = SelectedCustomer; } }"></DialogButton>
+            <DialogButton Content="Select" OnClick="() => { CustomerDialogVisibility = false; Transaction.CalculateTotal(SelectedCustomer); if (SelectedCustomer != null) { Transaction.Customer = SelectedCustomer; } }"></DialogButton>
             <DialogButton Content="Cancel" OnClick="() => { CustomerDialogVisibility = false; SelectedCustomer = new Customer(); }"></DialogButton>
         </DialogButtons>
     </SfDialog>
@@ -354,7 +354,7 @@
                     <div class="row">
                         <div class="col-2">
                             <label>Discount Percent</label>
-                            <input class="form-control" type="number" @oninput="(e) => { Transaction.Cart.ApplyCartDiscount((string)e.Value, AdjustTypeEnum.Percent); }" />
+                            <input class="form-control" type="number" @oninput="(e) => { Transaction.Cart.ApplyCartDiscount((string)e.Value, DiscountTypeEnum.Percent); }" />
                         </div>
                         <div class="col-2">
                             <label>New Subtotal</label>
@@ -390,13 +390,13 @@
                                     <label>@cartProduct.Title</label>
                                 </td>
                                 <td>
-                                    <label>@cartProduct.Cost.ToString("c")</label>
+                                    <label>@cartProduct.Price.ToString("c")</label>
                                 </td>
                                 <td>
-                                    <input type="number" class="form-control" @oninput="(e) => Transaction.Cart.ApplyIndvItemDiscount(cartProduct, e.Value, AdjustTypeEnum.Percent)" />
+                                    <input type="number" class="form-control" @oninput="(e) => Transaction.Cart.ApplyIndvItemDiscount(cartProduct, e.Value, DiscountTypeEnum.Percent)" />
                                 </td>
                                 <td>
-                                    <input type="number" class="form-control" @oninput="(e) => Transaction.Cart.ApplyIndvItemDiscount(cartProduct, e.Value, AdjustTypeEnum.Amount)" />
+                                    <input type="number" class="form-control" @oninput="(e) => Transaction.Cart.ApplyIndvItemDiscount(cartProduct, e.Value, DiscountTypeEnum.Amount)" />
                                 </td>
                                 <td>
                                 </td>
@@ -415,7 +415,7 @@
             </Content>
         </DialogTemplates>
         <DialogButtons>
-            <DialogButton Content="Close" OnClick="() => { AdjustDialogVisibility = false; Transaction.CalcTotal(SelectedCustomer); }"></DialogButton>
+            <DialogButton Content="Close" OnClick="() => { AdjustDialogVisibility = false; Transaction.CalculateTotal(SelectedCustomer); }"></DialogButton>
         </DialogButtons>
     </SfDialog>
 

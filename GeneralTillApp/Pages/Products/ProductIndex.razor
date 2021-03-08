@@ -45,7 +45,7 @@
                 <GridColumn Field="@nameof(Product.OnHand)" HeaderText="On Hand" Width="100" HeaderTextAlign="TextAlign.Center" TextAlign="TextAlign.Center"></GridColumn>
                 <GridColumn Field="@nameof(Product.OnOrder)" HeaderText="On Order" Width="110" HeaderTextAlign="TextAlign.Center" TextAlign="TextAlign.Center"></GridColumn>
                 <GridColumn Field="@nameof(Product.AcqCost)" HeaderText="Acq. Cost" Width="120" TextAlign="TextAlign.Center" Format="c"></GridColumn>
-                <GridColumn Field="@nameof(Product.Cost)" HeaderText="Retail Cost" Width="120" TextAlign="TextAlign.Center" Format="c"></GridColumn>
+                <GridColumn Field="@nameof(Product.Price)" HeaderText="Retail Cost" Width="120" TextAlign="TextAlign.Center" Format="c"></GridColumn>
                 <GridColumn Field="ProductGroup.Name" HeaderText="Product Group" EditType="EditType.DropDownEdit">
                     <EditTemplate>
                         <SfDropDownList TValue="ProductGroup"
@@ -203,7 +203,7 @@
                         product.OnHand = arg.Data.OnHand;
                         product.OnOrder = arg.Data.OnOrder;
                         product.AcqCost = arg.Data.AcqCost;
-                        product.Cost = arg.Data.Cost;
+                        product.Price = arg.Data.Price;
                         product.Discountable = arg.Data.Discountable;
                         product.PST = arg.Data.PST;
                         product.GST = arg.Data.GST;

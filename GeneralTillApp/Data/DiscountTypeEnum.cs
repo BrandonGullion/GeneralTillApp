@@ -5,9 +5,11 @@ using System.Threading.Tasks;
 
 namespace GeneralTillApp.Data
 {
-    public enum AdjustTypeEnum
+    public enum DiscountTypeEnum
     {
+        None,
         Amount, 
-        Percent
+        Percent,
+        BothPercentAndAmount,
     }
 }
